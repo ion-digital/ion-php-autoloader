@@ -1,0 +1,39 @@
+{
+    "name": "ion/autoloader",
+    "type": "library",
+    "description": "A small autoloading library, compatible with Composer, that allows you to customise your autoloading functionality.",
+    "keywords": [
+        "PHP",
+        "boot strap",
+        "bootstrap",
+        "autoload",
+        "autoload helper"
+    ],
+    "homepage": "https://bitbucket.org/ion-digital-projects/autoloader",
+    "license": "LGPL-3.0",
+    "authors": [
+        {
+            "name": "Justus Meyer",
+            "role": "developer",
+            "homepage": "https://justusmeyer.com",
+            "email": "justus@justusmeyer.com"
+        }
+    ],
+    "support": {
+        "issues": "https://bitbucket.org/ion-digital-projects/autoloader/issues"
+    },
+    "require": {
+        "php": ">=5.6"
+    },
+    "require-dev": {
+        "php": "^7.2",
+        "ion/dev": "dev-master"
+    },
+    
+    "minimum-stability": "dev", 
+    "autoload": {
+        "files": [
+            "autoload.php"
+        ]
+    }
+}
