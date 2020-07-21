@@ -27,7 +27,7 @@
     },
     "require-dev": {
         "php": "^7.2",
-        "ion/dev": "dev-master"
+        "ion/dev": "dev-release/master"
     },
     
     "minimum-stability": "dev", 
