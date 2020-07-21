@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4db073e0abc4c9d05c8c22ab4b70356b",
+    "content-hash": "d9342e2d920c6042a4c8d3757c884560",
     "packages": [],
     "packages-dev": [
         {
@@ -79,16 +79,16 @@
         },
         {
             "name": "ion/dev",
-            "version": "dev-master",
+            "version": "dev-release/master",
             "source": {
                 "type": "git",
                 "url": "https://bitbucket.org/ion-digital-projects/dev.git",
-                "reference": "0db9e220f635f8ecc6f0b11344857ddf60f54153"
+                "reference": "d0ebf6035c86fd13cb1a1cde67eeff82c4751bc9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://bitbucket.org/ion-digital-projects/dev/get/0db9e220f635f8ecc6f0b11344857ddf60f54153.zip",
-                "reference": "0db9e220f635f8ecc6f0b11344857ddf60f54153",
+                "url": "https://bitbucket.org/ion-digital-projects/dev/get/d0ebf6035c86fd13cb1a1cde67eeff82c4751bc9.zip",
+                "reference": "d0ebf6035c86fd13cb1a1cde67eeff82c4751bc9",
                 "shasum": ""
             },
             "require": {
@@ -137,7 +137,7 @@
                 "development tools",
                 "ion"
             ],
-            "time": "2020-07-18T00:49:10+00:00"
+            "time": "2020-07-21T10:56:20+00:00"
         },
         {
             "name": "ion/php-trans-porter",
@@ -673,12 +673,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpDocumentor/ReflectionDocBlock.git",
-                "reference": "eb3320ef010709f339f118dde1645e197c4961ec"
+                "reference": "1ac416df3f66c542f2d3688925105b539f064b64"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpDocumentor/ReflectionDocBlock/zipball/eb3320ef010709f339f118dde1645e197c4961ec",
-                "reference": "eb3320ef010709f339f118dde1645e197c4961ec",
+                "url": "https://api.github.com/repos/phpDocumentor/ReflectionDocBlock/zipball/1ac416df3f66c542f2d3688925105b539f064b64",
+                "reference": "1ac416df3f66c542f2d3688925105b539f064b64",
                 "shasum": ""
             },
             "require": {
@@ -717,7 +717,7 @@
                 }
             ],
             "description": "With this component, a library can provide support for annotations via DocBlocks or otherwise retrieve information that is embedded in a DocBlock.",
-            "time": "2020-07-09T12:42:26+00:00"
+            "time": "2020-07-21T08:16:41+00:00"
         },
         {
             "name": "phpdocumentor/type-resolver",
