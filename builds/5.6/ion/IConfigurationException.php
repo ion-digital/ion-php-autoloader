@@ -8,7 +8,6 @@ namespace ion;
  *
  * @author Justus
  */
-
 interface IConfigurationException
 {
 }

@@ -10,7 +10,6 @@ namespace ion;
  * @author Justus
  */
 use Exception;
-
 class ConfigurationException extends Exception implements IConfigurationException
 {
     /**
@@ -19,10 +18,8 @@ class ConfigurationException extends Exception implements IConfigurationExceptio
      * 
      * @return mixed
      */
-    
     public function __construct($message = "", $code = 0, \Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
     }
-
 }

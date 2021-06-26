@@ -8,7 +8,6 @@ namespace ion;
  *
  * @author Justus
  */
-
 interface IPackage
 {
     /**
@@ -26,9 +25,7 @@ interface IPackage
      * 
      * @return IPackage Returns the new package instance.
      */
-    
     static function create(string $vendor, string $project, array $developmentPaths, array $additionalPaths = null, string $projectRoot = null, ISemVer $version = null, bool $enableDebug = null, bool $enableCache = null, array $loaderClassNames = null) : IPackage;
-    
     /**
      * Create a search path string for the package.
      * 
@@ -37,17 +34,13 @@ interface IPackage
      * 
      * @return ?string __NULL__ if no string could be created, the string if it could.
      */
-    
     static function createSearchPath(IPackage $package, string $path);
-    
     /**
      * Return all registered package instances.
      * 
      * @return array An array containing all registered package instances.
      */
-    
     static function getInstances() : array;
-    
     /**
      * Check if a package has been registered.
      * 
@@ -56,9 +49,7 @@ interface IPackage
      * 
      * @return bool Returns __true__ if the package as been registered, __false__ if not.
      */
-    
     static function hasInstance(string $vendorName, string $projectName) : bool;
-    
     /**
      * Get a package instance by package name.
      * 
@@ -67,9 +58,7 @@ interface IPackage
      * 
      * @return IPackage Returns the registered package instance.
      */
-    
     static function getInstance(string $vendorName, string $projectName);
-    
     /**
      * Get the directory of the last function/method call (or further, depending on $back).
      * 
@@ -77,79 +66,59 @@ interface IPackage
      * 
      * @return string Return the resulting directory.
      */
-    
     static function getCallingDirectory(int $back = 1) : string;
-    
     /**
      * Destroy an instance.
      *
      * @return void
      */
-    
     function destroy();
-    
     /**
      * Get the registered auto-load hooks.
      * 
      * @return array Returns all registered auto-load hooks.
      */
-    
     function getHooks() : array;
-    
     /**
      * Get the registered loaders.
      * 
      * @return array Returns all registered loaders.
      */
-    
     function getLoaders() : array;
-    
     /**
      * Get the package version.
      * 
      * @return ?ISemVer Returns the specified version of the package, or null if not specified.
      */
-    
     function getVersion();
-    
     /**
      * Get the package vendor name.
      * 
      * @return string Returns the vendor name.
      */
-    
     function getVendor() : string;
-    
     /**
      * Get the package project name.
      *
      * @return string Returns the project name.
      */
-    
     function getProject() : string;
-    
     /**
      * Get the package name (in the format vendor/project).
      *
      * @return string Returns the package name (in the format vendor/project).
      */
-    
     function getName() : string;
-    
     /**
      * Get the project root directory.
      *
      * @return string Returns the project root directory.
      */
-    
     function getProjectRoot() : string;
-    
     /**
      * Get the project entry file (if available)
      */
-    
     function getProjectEntry();
-    
     /*
      * Returns whether the cache is enabled.
      * 
@@ -160,9 +129,7 @@ interface IPackage
      * 
      * @return bool
      */
-    
     function isCacheEnabled() : bool;
-    
     /*
      * Returns the cache array.
      * 
@@ -173,9 +140,7 @@ interface IPackage
      * 
      * @return array
      */
-    
     function getCache() : array;
-    
     /*
      * Forces all cache items to be saved immediately, and don't wait for shut-down.
      * 
@@ -185,9 +150,7 @@ interface IPackage
      * 
      * @return void
      */
-    
     function flushCache();
-    
     /*
      * Returns the development path array.
      * 
@@ -198,9 +161,7 @@ interface IPackage
      * 
      * @return array
      */
-    
     function getDevelopmentPaths() : array;
-    
     /*
      * Returns the additional path array.
      * 
@@ -211,9 +172,7 @@ interface IPackage
      * 
      * @return array
      */
-    
     function getAdditionalPaths() : array;
-    
     /*
      * Returns the resulting include path array (development paths and additional paths - depending on the package debug setting).
      *
@@ -224,7 +183,5 @@ interface IPackage
      * 
      * @return array
      */
-    
     function getSearchPaths() : array;
-
 }

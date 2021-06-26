@@ -8,7 +8,6 @@ namespace ion\Packages;
  *
  * @author Justus
  */
-
 interface IPackageException
 {
 }

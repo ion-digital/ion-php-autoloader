@@ -11,7 +11,6 @@ namespace ion\Packages;
  */
 use ion\IPackage;
 use ion\Package;
-
 abstract class AutoLoader implements IAutoLoader
 {
     const CACHE_FILENAME_PREFIX = 'ion-auto-load';
@@ -26,43 +25,36 @@ abstract class AutoLoader implements IAutoLoader
      * 
      * @return IAutoLoader
      */
-    
     public static function create(IPackage $package, string $includePath) : IAutoLoader
     {
         return new static($package, $includePath);
     }
-    
     /**
      * method
      * 
      * 
      * @return string
      */
-    
     public static function createCacheFilename(string $deploymentId) : string
     {
         return static::CACHE_FILENAME_PREFIX . '-' . $deploymentId . '.' . static::CACHE_FILENAME_EXTENSION;
     }
-    
     /**
      * method
      * 
      * 
      * @return string
      */
-    
     public static function createDeploymentId(IPackage $package, string $includePath) : string
     {
         return md5($includePath . PHP_MAJOR_VERSION . PHP_MINOR_VERSION . ($package->getVersion() !== null ? $package->getVersion()->toString() : ''));
     }
-    
     /**
      * method
      * 
      * 
      * @return string
      */
-    
     private static function strReplace(array $values, string $string) : string
     {
         foreach ($values as $key => $value) {
@@ -70,7 +62,6 @@ abstract class AutoLoader implements IAutoLoader
         }
         return $string;
     }
-    
     private $package = null;
     private $includePath = null;
     private $cache = [];
@@ -82,7 +73,6 @@ abstract class AutoLoader implements IAutoLoader
      * 
      * @return mixed
      */
-    
     protected function __construct(IPackage $package, string $includePath)
     {
         $this->package = $package;
@@ -101,67 +91,55 @@ abstract class AutoLoader implements IAutoLoader
             });
         }
     }
-    
     /**
      * method
      * 
      * @return string
      */
-    
     private function getConstantName() : string
     {
         return static::CACHE_CONSTANT_PREFIX . $this->getDeploymentId();
     }
-    
     /**
      * method
      * 
      * @return string
      */
-    
     public function getDeploymentId() : string
     {
         return $this->deploymentId;
     }
-    
     /**
      * method
      * 
      * @return IPackage
      */
-    
     public function getPackage() : IPackage
     {
         return $this->package;
     }
-    
     /**
      * method
      * 
      * @return string
      */
-    
     public function getIncludePath() : string
     {
         return $this->includePath;
     }
-    
     /**
      * method
      * 
      * 
      * @return ?string
      */
-    
     protected abstract function loadClass(string $className);
-    
     /**
      * method
      * 
      * 
      * @return bool
      */
-    
     public final function load(string $className) : bool
     {
         // This shouldn't be necessary?
@@ -186,14 +164,12 @@ abstract class AutoLoader implements IAutoLoader
         }
         return $this->loadClass($className) !== null;
     }
-    
     /**
      * method
      * 
      * 
      * @return bool
      */
-    
     protected function hasCacheEntry(string $className) : bool
     {
         if (!$this->getPackage()->isCacheEnabled()) {
@@ -204,14 +180,12 @@ abstract class AutoLoader implements IAutoLoader
         }
         return false;
     }
-    
     /**
      * method
      * 
      * 
      * @return ?array
      */
-    
     protected function getCacheEntry(string $className)
     {
         if ($this->hasCacheEntry($className)) {
@@ -219,14 +193,12 @@ abstract class AutoLoader implements IAutoLoader
         }
         return null;
     }
-    
     /**
      * method
      * 
      * 
      * @return void
      */
-    
     protected function setCacheEntry(string $className, string $path)
     {
         if (!$this->hasCacheEntry($className)) {
@@ -234,13 +206,11 @@ abstract class AutoLoader implements IAutoLoader
         }
         $this->cache[$className] = ['path' => $path];
     }
-    
     /**
      * method
      * 
      * @return void
      */
-    
     public function saveCache()
     {
         if ($this->newEntries || $this->getPackage()->isCacheEnabled() && defined(Package::ION_AUTOLOAD_CACHE_DEBUG) && constant(Package::ION_AUTOLOAD_CACHE_DEBUG)) {
@@ -252,13 +222,11 @@ abstract class AutoLoader implements IAutoLoader
             $this->newEntries = false;
         }
     }
-    
     /**
      * method
      * 
      * @return bool
      */
-    
     public function loadCache() : bool
     {
         $path = $this->getIncludePath() . static::createCacheFilename($this->getDeploymentId());
@@ -277,5 +245,4 @@ abstract class AutoLoader implements IAutoLoader
         }
         return false;
     }
-
 }

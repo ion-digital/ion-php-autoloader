@@ -9,7 +9,6 @@ namespace ion;
  *
  * @author Justus
  */
-
 class SemVer implements ISemVer
 {
     /**
@@ -18,19 +17,16 @@ class SemVer implements ISemVer
      * 
      * @return ISemVer
      */
-    
     public static function create($major = 0, $minor = 0, $patch = 0, $release = null, array $buildData = null)
     {
         return new static($major, $minor, $patch, $release, $buildData);
     }
-    
     /**
      * method
      * 
      * 
      * @return ?ISemVer
      */
-    
     public static function parse($string)
     {
         $tokens = [];
@@ -93,14 +89,12 @@ class SemVer implements ISemVer
         }
         return null;
     }
-    
     /**
      * method
      * 
      * 
      * @return ?ISemVer
      */
-    
     public static function parsePackageJson($data)
     {
         $major = 0;
@@ -131,14 +125,12 @@ class SemVer implements ISemVer
         }
         return null;
     }
-    
     /**
      * method
      * 
      * 
      * @return ?ISemVer
      */
-    
     public static function parseComposerJson($data)
     {
         $json = json_decode($data, true);
@@ -149,7 +141,6 @@ class SemVer implements ISemVer
         }
         return null;
     }
-    
     private $major = null;
     private $minor = null;
     private $patch = null;
@@ -161,7 +152,6 @@ class SemVer implements ISemVer
      * 
      * @return mixed
      */
-    
     public function __construct($major = 0, $minor = 0, $patch = 0, $release = null, array $buildData = null)
     {
         $this->major = $major;
@@ -170,68 +160,56 @@ class SemVer implements ISemVer
         $this->release = $release;
         $this->build = $buildData === null ? [] : $buildData;
     }
-    
     /**
      * method
      * 
      * @return int
      */
-    
     public function getMajor()
     {
         return $this->major;
     }
-    
     /**
      * method
      * 
      * @return int
      */
-    
     public function getMinor()
     {
         return $this->minor;
     }
-    
     /**
      * method
      * 
      * @return int
      */
-    
     public function getPatch()
     {
         return $this->patch;
     }
-    
     /**
      * method
      * 
      * @return ?string
      */
-    
     public function getRelease()
     {
         return $this->release;
     }
-    
     /**
      * method
      * 
      * @return array
      */
-    
     public function getBuildData()
     {
         return $this->build;
     }
-    
     /**
      * method
      * 
      * @return string
      */
-    
     public function toString()
     {
         $string = join('.', [$this->getMajor(), $this->getMinor(), $this->getPatch()]);
@@ -243,24 +221,20 @@ class SemVer implements ISemVer
         }
         return $string;
     }
-    
     /**
      * method
      * 
      * @return string
      */
-    
     public function toVcsTag()
     {
         return 'v' . $this->toString();
     }
-    
     /**
      * method
      * 
      * @return array
      */
-    
     public function toArray()
     {
         $array = [$this->getMajor(), $this->getMinor(), $this->getPatch()];
@@ -272,25 +246,21 @@ class SemVer implements ISemVer
         }
         return $array;
     }
-    
     /**
      * method
      * 
      * @return string
      */
-    
     public function __toString()
     {
         return $this->toString();
     }
-    
     /**
      * method
      * 
      * 
      * @return bool
      */
-    
     public function isHigherThan(ISemVer $semVer)
     {
         if ($this->getMajor() > $semVer->getMajor()) {
@@ -308,14 +278,12 @@ class SemVer implements ISemVer
         }
         return false;
     }
-    
     /**
      * method
      * 
      * 
      * @return bool
      */
-    
     public function isLowerThan(ISemVer $semVer)
     {
         if ($this->getMajor() < $semVer->getMajor()) {
@@ -333,14 +301,12 @@ class SemVer implements ISemVer
         }
         return false;
     }
-    
     /**
      * method
      * 
      * 
      * @return bool
      */
-    
     public function isEqualTo(ISemVer $semVer)
     {
         if ($this->getMajor() !== $semVer->getMajor()) {
@@ -354,5 +320,4 @@ class SemVer implements ISemVer
         }
         return true;
     }
-
 }

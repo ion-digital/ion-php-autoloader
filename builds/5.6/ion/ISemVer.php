@@ -4,7 +4,6 @@
  */
 namespace ion;
 
-
 interface ISemVer
 {
     /**
@@ -13,36 +12,28 @@ interface ISemVer
      * 
      * @return ?ISemVer
      */
-    
     static function parse($string);
-    
     /**
      * method
      * 
      * 
      * @return ?ISemVer
      */
-    
     static function parsePackageJson($data);
-    
     /**
      * method
      * 
      * 
      * @return ?ISemVer
      */
-    
     static function parseComposerJson($data);
-    
     /**
      * method
      * 
      * 
      * @return ISemVer
      */
-    
     static function create($major = 0, $minor = 0, $patch = 1, $release = null, array $buildData = null);
-    
     /**
      * Instance constructor.
      * 
@@ -52,73 +43,55 @@ interface ISemVer
      * 
      * @return void
      */
-    
     function __construct($major = 0, $minor = 0, $patch = 1, $release = null, array $buildData = []);
-    
     /**
      * Get the major version component.
      * 
      * @return int Returns the major version component.
      */
-    
     function getMajor();
-    
     /**
      * Get the minor version component.
      * 
      * @return int Returns the minor version component.
      */
-    
     function getMinor();
-    
     /**
      * Get the patch version component.
      * 
      * @return int Returns the patch version component.
      */
-    
     function getPatch();
-    
     /**
      * Get the release version component.
      * 
      * @return int Returns the patch version component.
      */
-    
     function getRelease();
-    
     /**
      * Get the build data version component.
      * 
      * @return int Returns the patch version component.
      */
-    
     function getBuildData();
-    
     /**
      * Get the version as a string.
      * 
      * @return string Return the version as a string.
      */
-    
     function toString();
-    
     /**
      * Get the version as a VCS tag (e.g: v0.0.0)
      * 
      * @return string The version as a VCS tag.
      */
-    
     function toVcsTag();
-    
     /**
      * Get the version as an array.
      * 
      * @return array Return the version as an array.
      */
-    
     function toArray();
-    
     /**
      * Checks to see if this version is higher than the specified version.
      * 
@@ -126,9 +99,7 @@ interface ISemVer
      * 
      * @return bool Returns __true__ if the version is higher, __false__ if not.
      */
-    
     function isHigherThan(ISemVer $semVer);
-    
     /**
      * Checks to see if this version is lower than the specified version.
      * 
@@ -136,9 +107,7 @@ interface ISemVer
      * 
      * @return bool Returns __true__ if the version is lower, __false__ if not.
      */
-    
     function isLowerThan(ISemVer $semVer);
-    
     /**
      * Checks to see if this version is equal to the specified version.
      * 
@@ -146,7 +115,5 @@ interface ISemVer
      * 
      * @return bool Returns __true__ if the version is equal, __false__ if not.
      */
-    
     function isEqualTo(ISemVer $semVer);
-
 }

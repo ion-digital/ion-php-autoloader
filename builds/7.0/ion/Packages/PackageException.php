@@ -10,7 +10,6 @@ namespace ion\Packages;
  * @author Justus
  */
 use Exception;
-
 class PackageException extends Exception implements IPackageException
 {
     /**
@@ -19,10 +18,8 @@ class PackageException extends Exception implements IPackageException
      * 
      * @return mixed
      */
-    
     public function __construct(string $message = "", int $code = 0, \Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
     }
-
 }

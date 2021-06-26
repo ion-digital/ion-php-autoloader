@@ -16,7 +16,6 @@ use ion\Packages\Adapters\Psr0Loader;
 use ion\Packages\Adapters\Psr4Loader;
 use ion\IConfiguration;
 use ion\Configuration;
-
 final class Package implements IPackage
 {
     const PHP_VERSION_SEPARATOR = '.';
@@ -35,19 +34,16 @@ final class Package implements IPackage
      * 
      * @return IPackage
      */
-    
     public static function create(string $vendor, string $project, array $developmentPaths, array $additionalPaths = null, string $projectRoot = null, ISemVer $version = null, bool $enableDebug = null, bool $enableCache = null, array $loaderClassNames = null) : IPackage
     {
         return new static($vendor, $project, $developmentPaths, $additionalPaths, $projectRoot, $version, $enableDebug, $enableCache, $loaderClassNames);
     }
-    
     /**
      * method
      * 
      * 
      * @return ?string
      */
-    
     public static function createSearchPath(IPackage $package, string $path)
     {
         $includePath = trim($package->getProjectRoot(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . trim($path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
@@ -58,37 +54,31 @@ final class Package implements IPackage
         $includePath = realpath($includePath);
         return $includePath === false ? null : $includePath . DIRECTORY_SEPARATOR;
     }
-    
     /**
      * method
      * 
      * @return array
      */
-    
     public static function getInstances() : array
     {
         return static::$instances;
     }
-    
     /**
      * method
      * 
      * 
      * @return bool
      */
-    
     public static function hasInstance(string $vendorName, string $projectName) : bool
     {
         return (bool) array_key_exists($vendorName . '/' . $projectName, static::$instances);
     }
-    
     /**
      * method
      * 
      * 
      * @return ?IPackage
      */
-    
     public static function getInstance(string $vendorName, string $projectName)
     {
         if (!static::hasInstance($vendorName, $projectName)) {
@@ -96,26 +86,22 @@ final class Package implements IPackage
         }
         return static::$instances[$vendorName . '/' . $projectName];
     }
-    
     /**
      * method
      * 
      * 
      * @return void
      */
-    
     protected static function destroyInstance(self $instance)
     {
         unset(static::$instances[$instance->getName()]);
     }
-    
     /**
      * method
      * 
      * 
      * @return void
      */
-    
     protected static function registerInstance(self $instance)
     {
         if ($instance->getVersion() !== null) {
@@ -131,14 +117,12 @@ final class Package implements IPackage
         static::$instances[$instance->getName()] = $instance;
         return;
     }
-    
     /**
      * method
      * 
      * 
      * @return string
      */
-    
     public static function getCallingDirectory(int $back = 1) : string
     {
         $trace = debug_backtrace();
@@ -151,7 +135,6 @@ final class Package implements IPackage
         $trace = array_values($trace);
         return dirname($trace[array_search(__FUNCTION__, array_column($trace, 'function'))]['file']) . DIRECTORY_SEPARATOR;
     }
-    
     private $vendor = null;
     private $project = null;
     private $version = null;
@@ -173,7 +156,6 @@ final class Package implements IPackage
      * 
      * @return mixed
      */
-    
     protected function __construct(string $vendor, string $project, array $sourcePaths, array $additionalPaths = null, string $projectRoot = null, ISemVer $version = null, bool $enableDebug = null, bool $enableCache = null, array $loaderClassNames = null)
     {
         $this->vendor = $vendor;
@@ -273,13 +255,11 @@ final class Package implements IPackage
         static::registerInstance($this);
         $this->registerLoaders();
     }
-    
     /**
      * method
      * 
      * @return ?bool
      */
-    
     protected function isDependency()
     {
         // NULL = Possibly, not sure; TRUE = Definitely yes; FALSE = Definitely no.
@@ -289,13 +269,11 @@ final class Package implements IPackage
         }
         return null;
     }
-    
     /**
      * method
      * 
      * @return bool
      */
-    
     protected function hasRepository() : bool
     {
         $repos = ['.git', '.hg'];
@@ -306,35 +284,29 @@ final class Package implements IPackage
         }
         return false;
     }
-    
     /**
      * method
      * 
      * @return bool
      */
-    
     protected function hasDebugIndicator() : bool
     {
         return $this->getConfiguration()->getSettingAsBool('debug');
     }
-    
     /**
      * method
      * 
      * @return bool
      */
-    
     protected function hasCacheIndicator() : bool
     {
         return $this->getConfiguration()->getSettingAsBool('cache');
     }
-    
     /**
      * method
      * 
      * @return void
      */
-    
     protected function registerLoaders()
     {
         if (count($this->getHooks()) === 0) {
@@ -354,13 +326,11 @@ final class Package implements IPackage
         }
         return;
     }
-    
     /**
      * method
      * 
      * @return void
      */
-    
     public function destroy()
     {
         if (count($this->getHooks()) > 0) {
@@ -372,35 +342,29 @@ final class Package implements IPackage
         static::destroyInstance($this);
         return;
     }
-    
     /**
      * method
      * 
      * @return array
      */
-    
     public function getHooks() : array
     {
         return $this->hooks;
     }
-    
     /**
      * method
      * 
      * @return array
      */
-    
     public function getLoaders() : array
     {
         return $this->loaders;
     }
-    
     /**
      * method
      * 
      * @return IConfiguration
      */
-    
     public function getConfiguration() : IConfiguration
     {
         if ($this->config === null) {
@@ -408,14 +372,12 @@ final class Package implements IPackage
         }
         return $this->config;
     }
-    
     /**
      * method
      * 
      * 
      * @return string
      */
-    
     protected function getVendorRoot(string $includePath, int $phpMajorVersion = null, int $phpMinorVersion = null) : string
     {
         if ($phpMajorVersion !== null || $phpMajorVersion !== null && $phpMinorVersion !== null) {
@@ -426,13 +388,11 @@ final class Package implements IPackage
         }
         return $includePath . DIRECTORY_SEPARATOR . $this->vendor . DIRECTORY_SEPARATOR;
     }
-    
     /**
      * method
      * 
      * @return IConfiguration
      */
-    
     protected function loadConfiguration() : IConfiguration
     {
         if (defined(static::ION_PACKAGE_IGNORE_CONFIGURATION) && constant(static::ION_PACKAGE_IGNORE_CONFIGURATION) === true) {
@@ -448,13 +408,11 @@ final class Package implements IPackage
         }
         return Configuration::parseJson($data);
     }
-    
     /**
      * method
      * 
      * @return ?ISemVer
      */
-    
     protected function loadVersion()
     {
         if (defined(static::ION_PACKAGE_IGNORE_VERSION) && constant(static::ION_PACKAGE_IGNORE_VERSION) === true) {
@@ -479,150 +437,123 @@ final class Package implements IPackage
         }
         return null;
     }
-    
     /**
      * method
      * 
      * @return ?ISemVer
      */
-    
     public function getVersion()
     {
         return $this->version;
     }
-    
     /**
      * method
      * 
      * @return string
      */
-    
     public function getVendor() : string
     {
         return $this->vendor;
     }
-    
     /**
      * method
      * 
      * @return string
      */
-    
     public function getProject() : string
     {
         return $this->project;
     }
-    
     /**
      * method
      * 
      * @return string
      */
-    
     public function getName() : string
     {
         return $this->name;
     }
-    
     /**
      * method
      * 
      * @return string
      */
-    
     public function getProjectRoot() : string
     {
         return $this->projectRoot;
     }
-    
     /**
      * method
      * 
      * @return ?string
      */
-    
     public function getProjectEntry()
     {
         return $this->projectEntry;
     }
-    
     /**
      * method
      * 
      * @return bool
      */
-    
     public function isCacheEnabled() : bool
     {
         return $this->enableCache;
     }
-    
     /**
      * method
      * 
      * @return bool
      */
-    
     public function isDebugEnabled() : bool
     {
         return $this->enableDebug;
     }
-    
     /**
      * method
      * 
      * @return void
      */
-    
     public function flushCache()
     {
         foreach ($this->loaders as $loader) {
             $loader->saveCache();
         }
     }
-    
     /**
      * method
      * 
      * @return array
      */
-    
     public function getCache() : array
     {
         return $this->cache;
     }
-    
     /**
      * method
      * 
      * @return array
      */
-    
     public function getDevelopmentPaths() : array
     {
         return $this->sourcePaths;
     }
-    
     /**
      * method
      * 
      * @return array
      */
-    
     public function getAdditionalPaths() : array
     {
         return $this->includePaths;
     }
-    
     /**
      * method
      * 
      * @return array
      */
-    
     public function getSearchPaths() : array
     {
         return $this->searchPaths;
     }
-
 }
