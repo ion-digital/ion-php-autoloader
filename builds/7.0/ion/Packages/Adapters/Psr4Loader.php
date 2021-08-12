@@ -10,7 +10,6 @@ namespace ion\Packages\Adapters;
  * @author Justus
  */
 use ion\Packages\Loader;
-
 class Psr4Loader extends Psr0Loader
 {
     /**
@@ -19,7 +18,6 @@ class Psr4Loader extends Psr0Loader
      * 
      * @return ?string
      */
-    
     protected function loadClass(string $className)
     {
         $path = realpath($this->getIncludePath()) . DIRECTORY_SEPARATOR . substr($className, strrpos($className, DIRECTORY_SEPARATOR)) . '.php';
@@ -29,5 +27,4 @@ class Psr4Loader extends Psr0Loader
         }
         return parent::loadClass($className);
     }
-
 }

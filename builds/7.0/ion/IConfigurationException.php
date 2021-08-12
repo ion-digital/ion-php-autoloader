@@ -4,11 +4,13 @@
  */
 namespace ion;
 
+use Exception;
+use Throwable;
 /**
  *
- * @author Justus
+ * This interface is an alias for ConfigurationExceptionInterface.
+ *
  */
-
 interface IConfigurationException
 {
 }
