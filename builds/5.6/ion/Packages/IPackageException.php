@@ -4,11 +4,13 @@
  */
 namespace ion\Packages;
 
+use Exception;
+use \Exception as Throwable;
 /**
  *
- * @author Justus
+ * This interface is an alias for PackageExceptionInterface.
+ *
  */
-
 interface IPackageException
 {
 }

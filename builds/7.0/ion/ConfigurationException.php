@@ -10,8 +10,8 @@ namespace ion;
  * @author Justus
  */
 use Exception;
-
-class ConfigurationException extends Exception implements IConfigurationException
+use Throwable;
+class ConfigurationException extends Exception implements ConfigurationExceptionInterface
 {
     /**
      * method
@@ -19,10 +19,8 @@ class ConfigurationException extends Exception implements IConfigurationExceptio
      * 
      * @return mixed
      */
-    
-    public function __construct(string $message = "", int $code = 0, \Throwable $previous = null)
+    public function __construct(string $message = "", int $code = 0, Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
     }
-
 }

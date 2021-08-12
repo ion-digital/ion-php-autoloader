@@ -10,7 +10,6 @@ namespace ion\Packages\Adapters;
  * @author Justus
  */
 use ion\Packages\AutoLoader;
-
 class Psr0Loader extends AutoLoader
 {
     /**
@@ -19,7 +18,6 @@ class Psr0Loader extends AutoLoader
      * 
      * @return ?string
      */
-    
     protected function loadClass(string $className)
     {
         $path = realpath($this->getIncludePath()) . DIRECTORY_SEPARATOR . str_replace("\\", DIRECTORY_SEPARATOR, $className) . '.php';
@@ -29,5 +27,4 @@ class Psr0Loader extends AutoLoader
         }
         return null;
     }
-
 }

@@ -16,19 +16,20 @@ if (file_exists($autoLoadPath)) {
     require_once($autoLoadPath);
 }
 
-spl_autoload_register(function(/* string */ $className) {
+spl_autoload_register(function( /* string */ $className) {
 
     $dirs = [
+        
+        'source/classes',
+        'source/interfaces',
+        'source/traits',
         'builds/' . PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION,
         'builds/' . PHP_MAJOR_VERSION,
-        'source/classes'
     ];
 
     foreach($dirs as $dir) {
     
         $classPath = __DIR__ . DIRECTORY_SEPARATOR . $dir . DIRECTORY_SEPARATOR . str_replace("\\", DIRECTORY_SEPARATOR, $className) . '.php';
-
-        //echo($classPath . '<br />');
         
         $classPath = realPath($classPath);
         
@@ -39,6 +40,5 @@ spl_autoload_register(function(/* string */ $className) {
         }
     }
     
-    //exit;
 }, true, true);
 

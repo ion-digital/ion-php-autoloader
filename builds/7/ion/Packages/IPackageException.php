@@ -1,17 +1,20 @@
 <?php
-
 /*
  * See license information at the package root in LICENSE.md
  */
-
 namespace ion\Packages;
+
+use Exception;
+use Throwable;
 
 /**
  *
- * @author Justus
+ * This interface is an alias for PackageExceptionInterface.
+ *
  */
 
 interface IPackageException {
-    
-    // empty for now!
+
+    // No method definitions! Please see: PackageExceptionInterface.
+
 }

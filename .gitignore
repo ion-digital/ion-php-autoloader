@@ -1,4 +1,7 @@
+/.phpdoc/
 /vendor/
+/doc/
+/documentation/
 /archives/
 /nbproject/private/
 /autoloader.json

@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="ion/auto-loader" default="info">        
+<project name="ion/autoloader" default="info">        
     <import file="vendor/ion/dev/source/ant/build.xml" />
 </project>

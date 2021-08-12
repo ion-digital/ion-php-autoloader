@@ -9,15 +9,14 @@ namespace ion;
  *
  * @author Justus
  */
-use ion\ISemVer;
+use ion\SemVerInterface;
 use ion\SemVer;
 use ion\Packages\PackageException;
 use ion\Packages\Adapters\Psr0Loader;
 use ion\Packages\Adapters\Psr4Loader;
-use ion\IConfiguration;
+use ion\ConfigurationInterface;
 use ion\Configuration;
-
-final class Package implements IPackage
+final class Package implements PackageInterface
 {
     const PHP_VERSION_SEPARATOR = '.';
     const COMPOSER_FILENAME = 'composer.json';
@@ -30,25 +29,37 @@ final class Package implements IPackage
     const ION_PACKAGE_IGNORE_CONFIGURATION = 'ION_PACKAGE_IGNORE_CONFIGURATION';
     private static $instances = [];
     /**
-     * method
      * 
+     * Create a package instance.
      * 
-     * @return IPackage
+     * @param string $vendor The vendor name (__vendor__/project).
+     * @param string $project The project name (vendor/__project__).
+     * @param array $developmentPaths The paths to the PHP source.
+     * @param array $additionalPaths An optional list of additional relative directories to use as the root for auto-load functionality (prioritized above __$sourcePath__ if __$enableDebug__ is __FALSE__).     
+     * @param string $projectRoot An optional parameter to override the project root, if needed.
+     * @param SemVerInterface $version The current package version - will be loaded from file, if __NULL__ and if a version definition file exists, or a Composer version tag is available (in _composer.json_).
+     * @param bool $enableDebug Enable or disable debug mode. If __TRUE__ __$sourcePath__ will used as the auto-load root; if __FALSE__ __$includePaths__ will be searched before __$sourcePath__.
+     * @param bool $enableCache Enable or disable the autoload cache - if NULL, checks if '_ION_AUTOLOAD_CACHE_' is __TRUE__ - if not, then it defaults to __FALSE__.
+     * @param array $loaderClassNames A list of class names to instantiate as loaders - if __NULL__ the default is ['\ion\Packages\Adapters\Psr0Loader', '\ion\Packages\Adapters\Psr4Loader'].     
+     * 
+     * @return IPackage Returns the new package instance.
+     * 
      */
-    
-    public static function create($vendor, $project, array $developmentPaths, array $additionalPaths = null, $projectRoot = null, ISemVer $version = null, $enableDebug = null, $enableCache = null, array $loaderClassNames = null)
+    public static function create($vendor, $project, array $developmentPaths, array $additionalPaths = null, $projectRoot = null, SemVerInterface $version = null, $enableDebug = null, $enableCache = null, array $loaderClassNames = null)
     {
         return new static($vendor, $project, $developmentPaths, $additionalPaths, $projectRoot, $version, $enableDebug, $enableCache, $loaderClassNames);
     }
-    
     /**
-     * method
      * 
+     * Create a search path string for the package.
      * 
-     * @return ?string
+     * @param IPackage $package The package.
+     * @param string $path The include path.
+     * 
+     * @return ?string __NULL__ if no string could be created, the string if it could.
+     * 
      */
-    
-    public static function createSearchPath(IPackage $package, $path)
+    public static function createSearchPath(PackageInterface $package, $path)
     {
         $includePath = trim($package->getProjectRoot(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . trim($path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
         //echo $includePath . "\n";
@@ -58,37 +69,41 @@ final class Package implements IPackage
         $includePath = realpath($includePath);
         return $includePath === false ? null : $includePath . DIRECTORY_SEPARATOR;
     }
-    
     /**
-     * method
      * 
-     * @return array
+     * Return all registered package instances.
+     * 
+     * @return array An array containing all registered package instances.
+     * 
      */
-    
     public static function getInstances()
     {
         return static::$instances;
     }
-    
     /**
-     * method
      * 
+     * Check if a package has been registered.
      * 
-     * @return bool
+     * @param string $vendorName The package vendor name.
+     * @param string $projectName The package project name.
+     * 
+     * @return bool Returns __true__ if the package as been registered, __false__ if not.
+     * 
      */
-    
     public static function hasInstance($vendorName, $projectName)
     {
         return (bool) array_key_exists($vendorName . '/' . $projectName, static::$instances);
     }
-    
     /**
-     * method
      * 
+     * Get a package instance by package name.
      * 
-     * @return ?IPackage
+     * @param string $vendorName The package vendor name.
+     * @param string $projectName The package project name.
+     * 
+     * @return IPackage Returns the registered package instance.
+     * 
      */
-    
     public static function getInstance($vendorName, $projectName)
     {
         if (!static::hasInstance($vendorName, $projectName)) {
@@ -96,26 +111,22 @@ final class Package implements IPackage
         }
         return static::$instances[$vendorName . '/' . $projectName];
     }
-    
     /**
      * method
      * 
      * 
      * @return void
      */
-    
     protected static function destroyInstance(self $instance)
     {
         unset(static::$instances[$instance->getName()]);
     }
-    
     /**
      * method
      * 
      * 
      * @return void
      */
-    
     protected static function registerInstance(self $instance)
     {
         if ($instance->getVersion() !== null) {
@@ -131,14 +142,15 @@ final class Package implements IPackage
         static::$instances[$instance->getName()] = $instance;
         return;
     }
-    
     /**
-     * method
      * 
+     * Get the directory of the last function/method call (or further, depending on $back).
      * 
-     * @return string
+     * @param int $back The number of times / steps to trace back.
+     * 
+     * @return string Return the resulting directory.
+     * 
      */
-    
     public static function getCallingDirectory($back = 1)
     {
         $trace = debug_backtrace();
@@ -151,7 +163,6 @@ final class Package implements IPackage
         $trace = array_values($trace);
         return dirname($trace[array_search(__FUNCTION__, array_column($trace, 'function'))]['file']) . DIRECTORY_SEPARATOR;
     }
-    
     private $vendor = null;
     private $project = null;
     private $version = null;
@@ -173,8 +184,7 @@ final class Package implements IPackage
      * 
      * @return mixed
      */
-    
-    protected function __construct($vendor, $project, array $sourcePaths, array $additionalPaths = null, $projectRoot = null, ISemVer $version = null, $enableDebug = null, $enableCache = null, array $loaderClassNames = null)
+    protected function __construct($vendor, $project, array $sourcePaths, array $additionalPaths = null, $projectRoot = null, SemVerInterface $version = null, $enableDebug = null, $enableCache = null, array $loaderClassNames = null)
     {
         $this->vendor = $vendor;
         $this->project = $project;
@@ -273,13 +283,11 @@ final class Package implements IPackage
         static::registerInstance($this);
         $this->registerLoaders();
     }
-    
     /**
      * method
      * 
      * @return ?bool
      */
-    
     protected function isDependency()
     {
         // NULL = Possibly, not sure; TRUE = Definitely yes; FALSE = Definitely no.
@@ -289,13 +297,11 @@ final class Package implements IPackage
         }
         return null;
     }
-    
     /**
      * method
      * 
      * @return bool
      */
-    
     protected function hasRepository()
     {
         $repos = ['.git', '.hg'];
@@ -306,35 +312,29 @@ final class Package implements IPackage
         }
         return false;
     }
-    
     /**
      * method
      * 
      * @return bool
      */
-    
     protected function hasDebugIndicator()
     {
         return $this->getConfiguration()->getSettingAsBool('debug');
     }
-    
     /**
      * method
      * 
      * @return bool
      */
-    
     protected function hasCacheIndicator()
     {
         return $this->getConfiguration()->getSettingAsBool('cache');
     }
-    
     /**
      * method
      * 
      * @return void
      */
-    
     protected function registerLoaders()
     {
         if (count($this->getHooks()) === 0) {
@@ -354,13 +354,13 @@ final class Package implements IPackage
         }
         return;
     }
-    
     /**
-     * method
      * 
+     * Destroy an instance.
+     *
      * @return void
+     * 
      */
-    
     public function destroy()
     {
         if (count($this->getHooks()) > 0) {
@@ -372,35 +372,35 @@ final class Package implements IPackage
         static::destroyInstance($this);
         return;
     }
-    
     /**
-     * method
      * 
-     * @return array
+     * Get the registered auto-load hooks.
+     * 
+     * @return array Returns all registered auto-load hooks.
+     * 
      */
-    
     public function getHooks()
     {
         return $this->hooks;
     }
-    
     /**
-     * method
      * 
-     * @return array
+     * Get the registered loaders.
+     * 
+     * @return array Returns all registered loaders.
+     * 
      */
-    
     public function getLoaders()
     {
         return $this->loaders;
     }
-    
     /**
-     * method
      * 
-     * @return IConfiguration
+     * Get the the package configuration.
+     * 
+     * @return ConfigurationInterface Returns all registered loaders.
+     * 
      */
-    
     public function getConfiguration()
     {
         if ($this->config === null) {
@@ -408,14 +408,12 @@ final class Package implements IPackage
         }
         return $this->config;
     }
-    
     /**
      * method
      * 
      * 
      * @return string
      */
-    
     protected function getVendorRoot($includePath, $phpMajorVersion = null, $phpMinorVersion = null)
     {
         if ($phpMajorVersion !== null || $phpMajorVersion !== null && $phpMinorVersion !== null) {
@@ -426,13 +424,11 @@ final class Package implements IPackage
         }
         return $includePath . DIRECTORY_SEPARATOR . $this->vendor . DIRECTORY_SEPARATOR;
     }
-    
     /**
      * method
      * 
-     * @return IConfiguration
+     * @return ConfigurationInterface
      */
-    
     protected function loadConfiguration()
     {
         if (defined(static::ION_PACKAGE_IGNORE_CONFIGURATION) && constant(static::ION_PACKAGE_IGNORE_CONFIGURATION) === true) {
@@ -448,13 +444,11 @@ final class Package implements IPackage
         }
         return Configuration::parseJson($data);
     }
-    
     /**
      * method
      * 
-     * @return ?ISemVer
+     * @return ?SemVerInterface
      */
-    
     protected function loadVersion()
     {
         if (defined(static::ION_PACKAGE_IGNORE_VERSION) && constant(static::ION_PACKAGE_IGNORE_VERSION) === true) {
@@ -479,150 +473,143 @@ final class Package implements IPackage
         }
         return null;
     }
-    
     /**
-     * method
      * 
-     * @return ?ISemVer
+     * Get the package version.
+     * 
+     * @return ?SemVerInterface Returns the specified version of the package, or null if not specified.
+     * 
      */
-    
     public function getVersion()
     {
         return $this->version;
     }
-    
     /**
-     * method
      * 
-     * @return string
+     * Get the package vendor name.
+     * 
+     * @return string Returns the vendor name.
+     * 
      */
-    
     public function getVendor()
     {
         return $this->vendor;
     }
-    
     /**
-     * method
      * 
-     * @return string
+     * Get the package project name.
+     *
+     * @return string Returns the project name.
+     * 
      */
-    
     public function getProject()
     {
         return $this->project;
     }
-    
     /**
-     * method
+     * Get the package name (in the format vendor/project).
+     *
+     * @return string Returns the package name (in the format vendor/project).
      * 
-     * @return string
      */
-    
     public function getName()
     {
         return $this->name;
     }
-    
     /**
-     * method
+     * Get the project root directory.
+     *
+     * @return string Returns the project root directory.
      * 
-     * @return string
      */
-    
     public function getProjectRoot()
     {
         return $this->projectRoot;
     }
-    
     /**
-     * method
      * 
-     * @return ?string
+     * Get the project entry file (if available)
+     * 
      */
-    
     public function getProjectEntry()
     {
         return $this->projectEntry;
     }
-    
     /**
-     * method
      * 
-     * @return bool
+     * Returns whether the cache is enabled.
+     * 
+     * @return bool Returns __true_ if the cache is enabled, __false__ if otherwise.
+     * 
      */
-    
     public function isCacheEnabled()
     {
         return $this->enableCache;
     }
-    
     /**
-     * method
      * 
-     * @return bool
+     * Returns whether debug mode is enabled.
+     * 
+     * @return bool Returns __true_ if the debug mode is enabled, __false__ if otherwise.
+     * 
      */
-    
     public function isDebugEnabled()
     {
         return $this->enableDebug;
     }
-    
     /**
-     * method
      * 
-     * @return void
+     * Forces all cache items to be saved immediately, and don't wait for shut-down.
+     * 
      */
-    
     public function flushCache()
     {
         foreach ($this->loaders as $loader) {
             $loader->saveCache();
         }
     }
-    
     /**
-     * method
      * 
-     * @return array
+     * Returns the cache array.
+     * 
+     * @return array Returns the cache array.
+     * 
      */
-    
     public function getCache()
     {
         return $this->cache;
     }
-    
     /**
-     * method
      * 
-     * @return array
+     * Returns the development path array.
+     * 
+     * @return array Returns the source path array.
+     * 
      */
-    
     public function getDevelopmentPaths()
     {
         return $this->sourcePaths;
     }
-    
     /**
-     * method
      * 
-     * @return array
+     * Returns the additional path array.
+     * 
+     * @return array Returns the include path array.
+     * 
      */
-    
     public function getAdditionalPaths()
     {
         return $this->includePaths;
     }
-    
     /**
-     * method
      * 
-     * @return array
+     * Returns the resulting include path array (development paths and additional paths - depending on the package debug setting).
+     *
+     * @return array Returns the final include path array.
+     * 
      */
-    
     public function getSearchPaths()
     {
         return $this->searchPaths;
     }
-
 }
