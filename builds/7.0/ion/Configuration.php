@@ -9,15 +9,16 @@ namespace ion;
  *
  * @author Justus
  */
-class Configuration implements IConfiguration
+use ArrayAccess;
+class Configuration implements ConfigurationInterface, ArrayAccess
 {
     /**
      * method
      * 
      * 
-     * @return IConfiguration
+     * @return ConfigurationInterface
      */
-    public static function parseJson(string $data) : IConfiguration
+    public static function parseJson(string $data) : ConfigurationInterface
     {
         $json = json_decode($data, true);
         if (is_array($json)) {
@@ -53,9 +54,9 @@ class Configuration implements IConfiguration
      * method
      * 
      * 
-     * @return IConfiguration
+     * @return ConfigurationInterface
      */
-    protected final function setSetting(string $name, $value = null) : IConfiguration
+    protected final function setSetting(string $name, $value = null) : ConfigurationInterface
     {
         $this->settings[$name] = $value;
         return $this;

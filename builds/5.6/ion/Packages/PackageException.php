@@ -10,7 +10,8 @@ namespace ion\Packages;
  * @author Justus
  */
 use Exception;
-class PackageException extends Exception implements IPackageException
+use \Exception as Throwable;
+class PackageException extends Exception implements PackageExceptionInterface
 {
     /**
      * method
@@ -18,7 +19,7 @@ class PackageException extends Exception implements IPackageException
      * 
      * @return mixed
      */
-    public function __construct($message = "", $code = 0, \Throwable $previous = null)
+    public function __construct($message = "", $code = 0, Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
     }

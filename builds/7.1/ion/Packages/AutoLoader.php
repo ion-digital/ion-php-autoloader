@@ -9,9 +9,9 @@ namespace ion\Packages;
  *
  * @author Justus
  */
-use ion\IPackage;
+use ion\PackageInterface;
 use ion\Package;
-abstract class AutoLoader implements IAutoLoader
+abstract class AutoLoader implements AutoLoaderInterface
 {
     const CACHE_FILENAME_PREFIX = 'ion-auto-load';
     const CACHE_FILENAME_EXTENSION = 'php';
@@ -23,9 +23,9 @@ abstract class AutoLoader implements IAutoLoader
      * method
      * 
      * 
-     * @return IAutoLoader
+     * @return AutoLoaderInterface
      */
-    public static function create(IPackage $package, string $includePath) : IAutoLoader
+    public static function create(PackageInterface $package, string $includePath) : AutoLoaderInterface
     {
         return new static($package, $includePath);
     }
@@ -45,7 +45,7 @@ abstract class AutoLoader implements IAutoLoader
      * 
      * @return string
      */
-    public static function createDeploymentId(IPackage $package, string $includePath) : string
+    public static function createDeploymentId(PackageInterface $package, string $includePath) : string
     {
         return md5($includePath . PHP_MAJOR_VERSION . PHP_MINOR_VERSION . ($package->getVersion() !== null ? $package->getVersion()->toString() : ''));
     }
@@ -73,7 +73,7 @@ abstract class AutoLoader implements IAutoLoader
      * 
      * @return mixed
      */
-    protected function __construct(IPackage $package, string $includePath)
+    protected function __construct(PackageInterface $package, string $includePath)
     {
         $this->package = $package;
         $this->includePath = $includePath;
@@ -112,9 +112,9 @@ abstract class AutoLoader implements IAutoLoader
     /**
      * method
      * 
-     * @return IPackage
+     * @return PackageInterface
      */
-    public function getPackage() : IPackage
+    public function getPackage() : PackageInterface
     {
         return $this->package;
     }

@@ -12,10 +12,10 @@ namespace ion\Packages;
  * @author Justus
  */
 
-use \ion\IPackage;
+use \ion\PackageInterface;
 use \ion\Package;
 
-abstract class AutoLoader implements IAutoLoader {        
+abstract class AutoLoader implements AutoLoaderInterface {        
     
     protected const CACHE_FILENAME_PREFIX = 'ion-auto-load';    
     protected const CACHE_FILENAME_EXTENSION = 'php';    
@@ -24,22 +24,28 @@ abstract class AutoLoader implements IAutoLoader {
     protected const CACHE_FUNCTION_NAME_PREFIX = '__ion_auto_load';
     protected const CACHE_CONSTANT_PREFIX = '__ION_CACHE_';  
     
-    public static function create(IPackage $package, string $includePath): IAutoLoader {
+    public static function create(PackageInterface $package, string $includePath): AutoLoaderInterface {
+        
         return new static($package, $includePath);
     }	
     
     public static function createCacheFilename(string $deploymentId): string {
+        
         return static::CACHE_FILENAME_PREFIX . '-' . $deploymentId . '.' . static::CACHE_FILENAME_EXTENSION;
     }
     
-    public static function createDeploymentId(IPackage $package, string $includePath): string {
+    public static function createDeploymentId(PackageInterface $package, string $includePath): string {
+        
         return md5($includePath . PHP_MAJOR_VERSION . PHP_MINOR_VERSION . ($package->getVersion() !== null ? $package->getVersion()->toString() : ''));
     }
     
     private static function strReplace(array $values, string $string): string {
+        
         foreach($values as $key => $value) {
+            
             $string = str_replace('{$' . $key . '}', $value, $string);
         }
+        
         return $string;
     }    
     
@@ -51,7 +57,7 @@ abstract class AutoLoader implements IAutoLoader {
     private $newEntries = false;
     private $deploymentId = '';
     
-    protected function __construct(IPackage $package, string $includePath) {
+    protected function __construct(PackageInterface $package, string $includePath) {
         
         $this->package = $package;
         $this->includePath = $includePath;
@@ -75,18 +81,22 @@ abstract class AutoLoader implements IAutoLoader {
     }    	
 
     private function getConstantName(): string {
+        
         return static::CACHE_CONSTANT_PREFIX . $this->getDeploymentId();
     }
     
     public function getDeploymentId(): string {
+        
             return $this->deploymentId;
     }
     
-    public function getPackage(): IPackage {
+    public function getPackage(): PackageInterface {
+        
         return $this->package;
     }
     
     public function getIncludePath(): string {
+        
         return $this->includePath;
     }
     
@@ -129,11 +139,14 @@ abstract class AutoLoader implements IAutoLoader {
     }
 
     protected function hasCacheEntry(string $className): bool {
+        
         if(!$this->getPackage()->isCacheEnabled()) {
+            
             return false;
         }
         
         if(array_key_exists($className, $this->cache)) {
+            
             return true;
         }
         
@@ -141,7 +154,9 @@ abstract class AutoLoader implements IAutoLoader {
     }
     
     protected function getCacheEntry(string $className): ?array {
+        
         if($this->hasCacheEntry($className)) {
+            
             return $this->cache[$className];
         }
         
@@ -151,6 +166,7 @@ abstract class AutoLoader implements IAutoLoader {
     protected function setCacheEntry(string $className, string $path): void {
 
         if(!$this->hasCacheEntry($className)) {
+            
             $this->newEntries = true;
         }
         
@@ -164,10 +180,12 @@ abstract class AutoLoader implements IAutoLoader {
             $funcName = static::CACHE_FUNCTION_NAME_PREFIX . '_' . $this->getDeploymentId();
 
             $data = self::strReplace([
+                
                 'php_version' => 'for PHP version ' . PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION . ' ',
                 'pkg_version' => ($this->getPackage()->getVersion() !== null ? 'and package version ' . $this->getPackage()->getVersion()->toString(). ', ' : ''),
                 'time' => strftime('%c'),
                 'pkg_constant' => $this->getConstantName()
+                    
             ], static::CACHE_HEADER) . 'function &' . $funcName . '()' . (PHP_MAJOR_VERSION >= 7 ? ': array' : '') . " {\n\$array = " . var_export($this->cache, true) . ";\nreturn \$array;\n}";
             
             if(is_dir($this->getIncludePath())) {

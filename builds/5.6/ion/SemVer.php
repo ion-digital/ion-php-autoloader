@@ -9,13 +9,13 @@ namespace ion;
  *
  * @author Justus
  */
-class SemVer implements ISemVer
+class SemVer implements SemVerInterface
 {
     /**
      * method
      * 
      * 
-     * @return ISemVer
+     * @return SemVerInterface
      */
     public static function create($major = 0, $minor = 0, $patch = 0, $release = null, array $buildData = null)
     {
@@ -25,7 +25,7 @@ class SemVer implements ISemVer
      * method
      * 
      * 
-     * @return ?ISemVer
+     * @return ?SemVerInterface
      */
     public static function parse($string)
     {
@@ -93,7 +93,7 @@ class SemVer implements ISemVer
      * method
      * 
      * 
-     * @return ?ISemVer
+     * @return ?SemVerInterface
      */
     public static function parsePackageJson($data)
     {
@@ -129,7 +129,7 @@ class SemVer implements ISemVer
      * method
      * 
      * 
-     * @return ?ISemVer
+     * @return ?SemVerInterface
      */
     public static function parseComposerJson($data)
     {
@@ -147,10 +147,15 @@ class SemVer implements ISemVer
     private $release = null;
     private $build = [];
     /**
-     * method
      * 
+     * Instance constructor.
      * 
-     * @return mixed
+     * @param int $major The major version component.
+     * @param int $minor The minor version component.
+     * @param int $patch The patch version component.
+     * 
+     * @return void
+     * 
      */
     public function __construct($major = 0, $minor = 0, $patch = 0, $release = null, array $buildData = null)
     {
@@ -161,54 +166,66 @@ class SemVer implements ISemVer
         $this->build = $buildData === null ? [] : $buildData;
     }
     /**
-     * method
      * 
-     * @return int
+     * Get the major version component.
+     * 
+     * @return int Returns the major version component.
+     * 
      */
     public function getMajor()
     {
         return $this->major;
     }
     /**
-     * method
      * 
-     * @return int
+     * Get the minor version component.
+     * 
+     * @return int Returns the minor version component.
+     * 
      */
     public function getMinor()
     {
         return $this->minor;
     }
     /**
-     * method
      * 
-     * @return int
+     * Get the patch version component.
+     * 
+     * @return int Returns the patch version component.
+     * 
      */
     public function getPatch()
     {
         return $this->patch;
     }
     /**
-     * method
      * 
-     * @return ?string
+     * Get the release version component.
+     * 
+     * @return int Returns the patch version component.
+     * 
      */
     public function getRelease()
     {
         return $this->release;
     }
     /**
-     * method
      * 
-     * @return array
+     * Get the build data version component.
+     * 
+     * @return int Returns the patch version component.
+     * 
      */
     public function getBuildData()
     {
         return $this->build;
     }
     /**
-     * method
      * 
-     * @return string
+     * Get the version as a string.
+     * 
+     * @return string Return the version as a string.
+     * 
      */
     public function toString()
     {
@@ -222,18 +239,22 @@ class SemVer implements ISemVer
         return $string;
     }
     /**
-     * method
      * 
-     * @return string
+     * Get the version as a VCS tag (e.g: v0.0.0)
+     * 
+     * @return string The version as a VCS tag.
+     * 
      */
     public function toVcsTag()
     {
         return 'v' . $this->toString();
     }
     /**
-     * method
      * 
-     * @return array
+     * Get the version as an array.
+     * 
+     * @return array Return the version as an array.
+     * 
      */
     public function toArray()
     {
@@ -256,12 +277,15 @@ class SemVer implements ISemVer
         return $this->toString();
     }
     /**
-     * method
      * 
+     * Checks to see if this version is higher than the specified version.
      * 
-     * @return bool
+     * @param SemVerInterface $semVer The specified version to check.
+     * 
+     * @return bool Returns __true__ if the version is higher, __false__ if not.
+     * 
      */
-    public function isHigherThan(ISemVer $semVer)
+    public function isHigherThan(SemVerInterface $semVer)
     {
         if ($this->getMajor() > $semVer->getMajor()) {
             return true;
@@ -279,12 +303,15 @@ class SemVer implements ISemVer
         return false;
     }
     /**
-     * method
      * 
+     * Checks to see if this version is lower than the specified version.
      * 
-     * @return bool
+     * @param SemVerInterface $semVer The specified version to check.
+     * 
+     * @return bool Returns __true__ if the version is lower, __false__ if not.
+     * 
      */
-    public function isLowerThan(ISemVer $semVer)
+    public function isLowerThan(SemVerInterface $semVer)
     {
         if ($this->getMajor() < $semVer->getMajor()) {
             return true;
@@ -302,12 +329,15 @@ class SemVer implements ISemVer
         return false;
     }
     /**
-     * method
      * 
+     * Checks to see if this version is equal to the specified version.
      * 
-     * @return bool
+     * @param SemVerInterface $semVer The specified version to check.
+     * 
+     * @return bool Returns __true__ if the version is equal, __false__ if not.
+     * 
      */
-    public function isEqualTo(ISemVer $semVer)
+    public function isEqualTo(SemVerInterface $semVer)
     {
         if ($this->getMajor() !== $semVer->getMajor()) {
             return false;
