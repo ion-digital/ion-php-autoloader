@@ -78,16 +78,16 @@
         },
         {
             "name": "ion/dev",
-            "version": "v0.6.9+release/master",
+            "version": "v0.6.9+release/main",
             "source": {
                 "type": "git",
                 "url": "https://bitbucket.org/ion-digital-projects/dev.git",
-                "reference": "c2ae625fa8a35968f5243bcd25ca8a529bf865b8"
+                "reference": "c77a07c8a7d7d50309c1beea48229af8c4486115"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://bitbucket.org/ion-digital-projects/dev/get/c2ae625fa8a35968f5243bcd25ca8a529bf865b8.zip",
-                "reference": "c2ae625fa8a35968f5243bcd25ca8a529bf865b8",
+                "url": "https://bitbucket.org/ion-digital-projects/dev/get/c77a07c8a7d7d50309c1beea48229af8c4486115.zip",
+                "reference": "c77a07c8a7d7d50309c1beea48229af8c4486115",
                 "shasum": ""
             },
             "require": {
@@ -139,9 +139,9 @@
             ],
             "support": {
                 "issues": "https://bitbucket.org/ion-digital-projects/dev/issues",
-                "source": "https://bitbucket.org/ion-digital-projects/dev/src/c2ae625fa8a35968f5243bcd25ca8a529bf865b8/?at=v0.6.9+release/master"
+                "source": "https://bitbucket.org/ion-digital-projects/dev/src/c77a07c8a7d7d50309c1beea48229af8c4486115/?at=v0.6.9+release/main"
             },
-            "time": "2021-08-16T10:22:19+00:00"
+            "time": "2021-08-16T11:29:16+00:00"
         },
         {
             "name": "ion/php-trans-porter",
