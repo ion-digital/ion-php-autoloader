@@ -1,18 +1,15 @@
 <?php
-/*
- * See license information at the package root in LICENSE.md
- */
+
 namespace ion;
 
 
 /**
+ * Description of SemVer
  *
- * This interface is an alias for SemVerInterface.
- *
+ * @author Justus
  */
-
 interface ISemVer {
 
-    // No method definitions! Please see: SemVerInterface.
+    // No public methods!
 
 }

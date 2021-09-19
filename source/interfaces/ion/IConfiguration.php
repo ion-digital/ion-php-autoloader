@@ -1,19 +1,11 @@
 <?php
-/*
- * See license information at the package root in LICENSE.md
- */
+
 namespace ion;
 
-use ArrayAccess;
+use \ion\IArrayAccess;
 
-/**
- *
- * This interface is an alias for ConfigurationInterface.
- *
- */
+interface IConfiguration extends IArrayAccess {
 
-interface IConfiguration {
-
-    // No method definitions! Please see: ConfigurationInterface.
+    // No public methods!
 
 }

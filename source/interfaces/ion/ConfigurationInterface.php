@@ -1,19 +1,13 @@
 <?php
-/*
- * See license information at the package root in LICENSE.md
- */
+
 namespace ion;
 
-use ArrayAccess;
+use \ArrayAccess;
+use \ion\IConfiguration;
 
-
-
-interface ConfigurationInterface extends IConfiguration {
-
+interface ConfigurationInterface extends ArrayAccess, IConfiguration {
 
     static function parseJson(string $data): ConfigurationInterface;
-
-    function __construct(array $settings = []);
 
     function getSetting(string $name, $default = null);
 
@@ -25,7 +19,7 @@ interface ConfigurationInterface extends IConfiguration {
 
     function getSettingAsFloat(string $name, float $default = 0): float;
 
-    function getSettingAsArray(string $name, array $default = []): array;
+    function getSettingAsArray(string $name, array $default = [[  ]]): array;
 
     function toArray(): array;
 
@@ -36,4 +30,5 @@ interface ConfigurationInterface extends IConfiguration {
     function offsetSet($offset, $value): void;
 
     function offsetUnset($offset): void;
+
 }
