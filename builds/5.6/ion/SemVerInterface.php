@@ -1,9 +1,7 @@
 <?php
-/*
- * See license information at the package root in LICENSE.md
- */
 namespace ion;
 
+use ion\ISemVer;
 /**
  * Description of SemVer
  *
@@ -39,18 +37,6 @@ interface SemVerInterface extends ISemVer
      * @return ?SemVerInterface
      */
     static function parseComposerJson($data);
-    /**
-     *
-     * Instance constructor.
-     *
-     * @param int $major The major version component.
-     * @param int $minor The minor version component.
-     * @param int $patch The patch version component.
-     *
-     * @return void
-     *
-     */
-    function __construct($major = 0, $minor = 0, $patch = 0, $release = null, array $buildData = null);
     /**
      *
      * Get the major version component.
