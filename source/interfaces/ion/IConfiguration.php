@@ -2,9 +2,7 @@
 
 namespace ion;
 
-use \ion\IArrayAccess;
-
-interface IConfiguration extends IArrayAccess {
+interface IConfiguration {
 
     // No public methods!
 
