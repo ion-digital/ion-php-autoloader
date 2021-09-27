@@ -1,19 +1,11 @@
 <?php
-/*
- * See license information at the package root in LICENSE.md
- */
+
 namespace ion\Packages\Adapters;
 
-use ion\Packages\Loader;
+use \ion\Packages\Adapters\IPsr0Loader;
 
-/**
- *
- * This interface is an alias for Psr4LoaderInterface.
- *
- */
+interface IPsr4Loader extends IPsr0Loader {
 
-interface IPsr4Loader {
-
-    // No method definitions! Please see: Psr4LoaderInterface.
+    // No public methods!
 
 }

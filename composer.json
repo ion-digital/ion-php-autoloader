@@ -35,5 +35,10 @@
         "files": [
             "autoload.php"
         ]
+    },    
+    "autoload-dev": {
+        "psr-4": {
+            "ion\\": "tests/unit/ion/"
+        }
     }
 }

@@ -1,16 +1,11 @@
 <?php
-/*
- * See license information at the package root in LICENSE.md
- */
+
 namespace ion\Packages;
 
-use ion\PackageInterface;
-use ion\Package;
-
-
+use \ion\PackageInterface;
+use \ion\Packages\IAutoLoader;
 
 interface AutoLoaderInterface extends IAutoLoader {
-
 
     static function create(PackageInterface $package, string $includePath): AutoLoaderInterface;
 
@@ -29,4 +24,5 @@ interface AutoLoaderInterface extends IAutoLoader {
     function saveCache(): void;
 
     function loadCache(): bool;
+
 }
