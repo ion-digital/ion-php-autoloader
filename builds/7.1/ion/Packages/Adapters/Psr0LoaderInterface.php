@@ -1,10 +1,8 @@
 <?php
-/*
- * See license information at the package root in LICENSE.md
- */
 namespace ion\Packages\Adapters;
 
-use ion\Packages\AutoLoader;
+use ion\Packages\AutoLoaderInterface;
+use ion\Packages\Adapters\IPsr0Loader;
 interface Psr0LoaderInterface extends AutoLoaderInterface, IPsr0Loader
 {
 }

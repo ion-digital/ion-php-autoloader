@@ -19,6 +19,7 @@ use \ion\SemVer;
 use \ion\Packages\PackageException;
 use PHPUnit\Framework\TestCase;
 use \ion\Packages\AutoLoader;
+use \ion\Configuration;
 
 class ConfigurationTest extends TestCase {
 
