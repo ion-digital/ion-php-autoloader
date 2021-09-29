@@ -4,9 +4,8 @@ namespace ion;
 
 use \ion\SemVerInterface;
 use \ion\ConfigurationInterface;
-use \ion\IPackage;
 
-interface PackageInterface extends IPackage {
+interface PackageInterface {
 
     /**
      *

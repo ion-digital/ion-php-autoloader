@@ -1,13 +1,12 @@
 <?php
 namespace ion;
 
-use ion\ISemVer;
 /**
  * Description of SemVer
  *
  * @author Justus
  */
-interface SemVerInterface extends ISemVer
+interface SemVerInterface
 {
     /**
      * method

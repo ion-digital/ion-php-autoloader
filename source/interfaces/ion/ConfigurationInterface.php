@@ -3,9 +3,8 @@
 namespace ion;
 
 use \ArrayAccess;
-use \ion\IConfiguration;
 
-interface ConfigurationInterface extends ArrayAccess, IConfiguration {
+interface ConfigurationInterface extends ArrayAccess {
 
     static function parseJson(string $data): ConfigurationInterface;
 
