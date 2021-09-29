@@ -2,8 +2,7 @@
 namespace ion\Packages;
 
 use ion\PackageInterface;
-use ion\Packages\IAutoLoader;
-interface AutoLoaderInterface extends IAutoLoader
+interface AutoLoaderInterface
 {
     /**
      * method
