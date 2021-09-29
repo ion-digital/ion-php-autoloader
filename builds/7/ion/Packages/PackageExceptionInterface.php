@@ -2,9 +2,7 @@
 
 namespace ion\Packages;
 
-use \ion\Packages\IPackageException;
-
-interface PackageExceptionInterface extends IPackageException {
+interface PackageExceptionInterface {
 
     // No public methods!
 

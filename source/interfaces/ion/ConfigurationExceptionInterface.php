@@ -2,7 +2,7 @@
 
 namespace ion;
 
-interface IConfiguration {
+interface ConfigurationExceptionInterface {
 
     // No public methods!
 

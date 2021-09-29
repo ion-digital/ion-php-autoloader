@@ -2,7 +2,7 @@
 
 namespace ion\Packages;
 
-interface IAutoLoader {
+interface PackageExceptionInterface {
 
     // No public methods!
 
