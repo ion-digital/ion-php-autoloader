@@ -18,7 +18,7 @@ interface ConfigurationInterface extends ArrayAccess {
 
     function getSettingAsFloat(string $name, float $default = 0): float;
 
-    function getSettingAsArray(string $name, array $default = [[  ]]): array;
+    function getSettingAsArray(string $name, array $default = []): array;
 
     function toArray(): array;
 

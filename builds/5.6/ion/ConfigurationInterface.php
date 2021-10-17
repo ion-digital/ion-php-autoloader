@@ -52,7 +52,7 @@ interface ConfigurationInterface extends ArrayAccess
      * 
      * @return array
      */
-    function getSettingAsArray($name, array $default = [[]]);
+    function getSettingAsArray($name, array $default = []);
     /**
      * method
      * 
