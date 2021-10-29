@@ -2,9 +2,7 @@
 
 namespace ion;
 
-use \ArrayAccess;
-
-interface ConfigurationInterface extends ArrayAccess {
+interface ConfigurationInterface {
 
     static function parseJson(string $data): ConfigurationInterface;
 

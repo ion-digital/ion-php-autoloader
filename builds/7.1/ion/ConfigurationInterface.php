@@ -1,8 +1,7 @@
 <?php
 namespace ion;
 
-use ArrayAccess;
-interface ConfigurationInterface extends ArrayAccess
+interface ConfigurationInterface
 {
     /**
      * method
