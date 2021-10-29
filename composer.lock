@@ -78,16 +78,16 @@
         },
         {
             "name": "ion/dev",
-            "version": "v0.7.14+release/main",
+            "version": "v0.7.15+release/main",
             "source": {
                 "type": "git",
                 "url": "https://bitbucket.org/ion-digital-projects/dev.git",
-                "reference": "70a16fcd61714d0d9bc7aabb6e3e38b1ede51dc6"
+                "reference": "626486115cc49f55c07108c710cf97818fe833e9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://bitbucket.org/ion-digital-projects/dev/get/70a16fcd61714d0d9bc7aabb6e3e38b1ede51dc6.zip",
-                "reference": "70a16fcd61714d0d9bc7aabb6e3e38b1ede51dc6",
+                "url": "https://bitbucket.org/ion-digital-projects/dev/get/626486115cc49f55c07108c710cf97818fe833e9.zip",
+                "reference": "626486115cc49f55c07108c710cf97818fe833e9",
                 "shasum": ""
             },
             "require": {
@@ -141,9 +141,9 @@
             ],
             "support": {
                 "issues": "https://bitbucket.org/ion-digital-projects/dev/issues",
-                "source": "https://bitbucket.org/ion-digital-projects/dev/src/70a16fcd61714d0d9bc7aabb6e3e38b1ede51dc6/?at=v0.7.14+release/main"
+                "source": "https://bitbucket.org/ion-digital-projects/dev/src/626486115cc49f55c07108c710cf97818fe833e9/?at=v0.7.15+release/main"
             },
-            "time": "2021-10-19T22:44:30+00:00"
+            "time": "2021-10-29T13:37:56+00:00"
         },
         {
             "name": "ion/php-trans-porter",
@@ -3288,12 +3288,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/http-kernel.git",
-                "reference": "5e942925153975147eaf6cc6ed6e9d51d60b0245"
+                "reference": "8268f8ce66dce4d09c57ff358f9284d3a17a3e3f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/http-kernel/zipball/5e942925153975147eaf6cc6ed6e9d51d60b0245",
-                "reference": "5e942925153975147eaf6cc6ed6e9d51d60b0245",
+                "url": "https://api.github.com/repos/symfony/http-kernel/zipball/8268f8ce66dce4d09c57ff358f9284d3a17a3e3f",
+                "reference": "8268f8ce66dce4d09c57ff358f9284d3a17a3e3f",
                 "shasum": ""
             },
             "require": {
@@ -3384,7 +3384,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-09-30T16:33:05+00:00"
+            "time": "2021-10-29T08:35:52+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",
