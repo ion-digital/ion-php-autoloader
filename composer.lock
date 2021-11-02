@@ -743,12 +743,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpDocumentor/TypeResolver.git",
-                "reference": "9dc4bb058ffd1f194059f6b099bd6ca9c726aed4"
+                "reference": "2c26b0e4a925d571d1ca2757a65c14c6dc00898f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpDocumentor/TypeResolver/zipball/9dc4bb058ffd1f194059f6b099bd6ca9c726aed4",
-                "reference": "9dc4bb058ffd1f194059f6b099bd6ca9c726aed4",
+                "url": "https://api.github.com/repos/phpDocumentor/TypeResolver/zipball/2c26b0e4a925d571d1ca2757a65c14c6dc00898f",
+                "reference": "2c26b0e4a925d571d1ca2757a65c14c6dc00898f",
                 "shasum": ""
             },
             "require": {
@@ -786,7 +786,7 @@
                 "issues": "https://github.com/phpDocumentor/TypeResolver/issues",
                 "source": "https://github.com/phpDocumentor/TypeResolver/tree/1.x"
             },
-            "time": "2021-10-26T18:53:16+00:00"
+            "time": "2021-10-30T18:36:17+00:00"
         },
         {
             "name": "phpspec/prophecy",
@@ -2064,12 +2064,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/cache.git",
-                "reference": "f1cdbb34e2a0903ad56e1f55493f7775d7e7b280"
+                "reference": "8ccbc850a9daac635dd9f18000d31c592c5a4a55"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/cache/zipball/f1cdbb34e2a0903ad56e1f55493f7775d7e7b280",
-                "reference": "f1cdbb34e2a0903ad56e1f55493f7775d7e7b280",
+                "url": "https://api.github.com/repos/symfony/cache/zipball/8ccbc850a9daac635dd9f18000d31c592c5a4a55",
+                "reference": "8ccbc850a9daac635dd9f18000d31c592c5a4a55",
                 "shasum": ""
             },
             "require": {
@@ -2091,7 +2091,7 @@
             },
             "provide": {
                 "psr/cache-implementation": "1.0|2.0",
-                "psr/simple-cache-implementation": "1.0",
+                "psr/simple-cache-implementation": "1.0|2.0",
                 "symfony/cache-implementation": "1.0|2.0"
             },
             "require-dev": {
@@ -2099,7 +2099,7 @@
                 "doctrine/cache": "^1.6|^2.0",
                 "doctrine/dbal": "^2.13.1|^3.0",
                 "predis/predis": "^1.1",
-                "psr/simple-cache": "^1.0",
+                "psr/simple-cache": "^1.0|^2.0",
                 "symfony/config": "^4.4|^5.0|^6.0",
                 "symfony/dependency-injection": "^4.4|^5.0|^6.0",
                 "symfony/filesystem": "^4.4|^5.0|^6.0",
@@ -2153,7 +2153,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-10-27T13:14:56+00:00"
+            "time": "2021-10-29T16:09:06+00:00"
         },
         {
             "name": "symfony/cache-contracts",
@@ -2240,12 +2240,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/config.git",
-                "reference": "7de955b3ce1d2b5b4474d63220c0f278713b8550"
+                "reference": "f8148c2e1e23ea6c7ee50f53242067c2af9a50e1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/config/zipball/7de955b3ce1d2b5b4474d63220c0f278713b8550",
-                "reference": "7de955b3ce1d2b5b4474d63220c0f278713b8550",
+                "url": "https://api.github.com/repos/symfony/config/zipball/f8148c2e1e23ea6c7ee50f53242067c2af9a50e1",
+                "reference": "f8148c2e1e23ea6c7ee50f53242067c2af9a50e1",
                 "shasum": ""
             },
             "require": {
@@ -2311,7 +2311,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-10-27T13:15:55+00:00"
+            "time": "2021-10-30T10:27:42+00:00"
         },
         {
             "name": "symfony/console",
@@ -2928,12 +2928,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/finder.git",
-                "reference": "e6c34f742f52cf5c6eae814f925d6654fa7603cd"
+                "reference": "457942295a2d8e87595edfced324eddcd2c76614"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/finder/zipball/e6c34f742f52cf5c6eae814f925d6654fa7603cd",
-                "reference": "e6c34f742f52cf5c6eae814f925d6654fa7603cd",
+                "url": "https://api.github.com/repos/symfony/finder/zipball/457942295a2d8e87595edfced324eddcd2c76614",
+                "reference": "457942295a2d8e87595edfced324eddcd2c76614",
                 "shasum": ""
             },
             "require": {
@@ -2983,7 +2983,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-10-27T13:14:56+00:00"
+            "time": "2021-10-30T10:39:42+00:00"
         },
         {
             "name": "symfony/framework-bundle",
@@ -3288,12 +3288,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/http-kernel.git",
-                "reference": "8268f8ce66dce4d09c57ff358f9284d3a17a3e3f"
+                "reference": "2ac1ef60d3024da241b9c266b35582f9117f0424"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/http-kernel/zipball/8268f8ce66dce4d09c57ff358f9284d3a17a3e3f",
-                "reference": "8268f8ce66dce4d09c57ff358f9284d3a17a3e3f",
+                "url": "https://api.github.com/repos/symfony/http-kernel/zipball/2ac1ef60d3024da241b9c266b35582f9117f0424",
+                "reference": "2ac1ef60d3024da241b9c266b35582f9117f0424",
                 "shasum": ""
             },
             "require": {
@@ -3384,7 +3384,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-10-29T08:35:52+00:00"
+            "time": "2021-10-30T08:58:12+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",
