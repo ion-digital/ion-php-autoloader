@@ -231,6 +231,7 @@ final class Package implements PackageInterface {
     private $enableDebug = false;
     private $cache = [];
     private $config = null;
+    private $hooksRegistered = false;
 
     protected function __construct(string $vendor, string $project, array $sourcePaths, array $additionalPaths = null, string $projectRoot = null, SemVerInterface $version = null, bool $enableDebug = null, bool $enableCache = null, array $loaderClassNames = null) {
 

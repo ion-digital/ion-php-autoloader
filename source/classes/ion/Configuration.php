@@ -93,15 +93,14 @@ class Configuration implements ConfigurationInterface, ArrayAccess {
         return $this->settings;
     }
     
-    private static function offsetToKey($offset): ?string {
+    private static function offsetToKey($offset, array $settings): ?string {
         
         if(is_string($offset)) {
             
             return $offset;
-                    
         }
             
-        $keys = array_keys($this->settings);
+        $keys = array_keys($settings);
 
         if(count($keys) > intval($offset)) {
 
@@ -113,7 +112,7 @@ class Configuration implements ConfigurationInterface, ArrayAccess {
     
     public function offsetExists($offset): bool {
     
-        $key = static::offsetToKey($offset);
+        $key = static::offsetToKey($offset, $this->settings);
         
         if($key === null) {
             
@@ -123,9 +122,9 @@ class Configuration implements ConfigurationInterface, ArrayAccess {
         return array_key_exists($key, $this->settings);
     }
     
-    public function offsetGet($offset) {
+    public function offsetGet($offset): mixed {
         
-        $key = static::offsetToKey($offset);
+        $key = static::offsetToKey($offset, $this->settings);
         
         if($key === null) {
             
@@ -152,7 +151,7 @@ class Configuration implements ConfigurationInterface, ArrayAccess {
     
     public function offsetUnset($offset): void {
         
-        $key = static::offsetToKey($offset);
+        $key = static::offsetToKey($offset, $this->settings);
         
         if($key === null) {
                      

@@ -9,25 +9,21 @@
         "autoload",
         "autoload helper"
     ],
-    "homepage": "https://bitbucket.org/ion-digital-projects/autoloader",
+    "homepage": "https://github.com/ion-digital/ion-php-autoloader",
     "license": "LGPL-3.0",
     "authors": [
         {
             "name": "Justus Meyer",
             "role": "developer",
-            "homepage": "https://justusmeyer.com",
-            "email": "justus@justusmeyer.com"
+            "homepage": "https://justusmeyer.com"
         }
     ],
-    "support": {
-        "issues": "https://bitbucket.org/ion-digital-projects/autoloader/issues"
-    },
     "require": {
         "php": ">=5.6"
     },
     "require-dev": {
-        "php": "^7.2",
-        "ion/dev": "^0.7"
+        "php": "^8.2",
+        "ion/dev": "dev-main"
     },
     
     "minimum-stability": "dev", 
@@ -39,6 +35,11 @@
     "autoload-dev": {
         "psr-4": {
             "ion\\": "tests/unit/ion/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "ion/dev": true
         }
     }
 }
