@@ -48,9 +48,7 @@ abstract class AutoLoader implements AutoLoaderInterface {
         
         return $string;
     }    
-    
-    
-    
+
     private $package = null;
     private $includePath = null;
     private $cache = [];
@@ -222,8 +220,4 @@ abstract class AutoLoader implements AutoLoaderInterface {
         
         return false;
     }
-
-    
-
-    
 }

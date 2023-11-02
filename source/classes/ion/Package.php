@@ -22,17 +22,9 @@ use \ion\Configuration;
 
 final class Package implements PackageInterface {
 
-    private const PHP_VERSION_SEPARATOR = '.';
-    
-    public const COMPOSER_FILENAME = 'composer.json';
-    public const ION_PACKAGE_CONFIGURATION_FILENAME = "autoloader.json";
-    public const ION_PACKAGE_VERSION_FILENAME = 'version.json';
-    public const ION_AUTOLOAD_CACHE = 'ION_AUTOLOAD_CACHE';
-    public const ION_AUTOLOAD_CACHE_DEBUG = 'ION_AUTOLOAD_CACHE_DEBUG';    
-    public const ION_PACKAGE_IGNORE_VERSION = 'ION_PACKAGE_IGNORE_VERSION';
-    public const ION_PACKAGE_DEBUG = 'ION_PACKAGE_DEBUG';
-    public const ION_PACKAGE_IGNORE_CONFIGURATION = 'ION_PACKAGE_IGNORE_CONFIGURATION';
-    
+    public const ENABLE_AUTOLOAD_CACHE_DEFINITON = 'ENABLE_AUTOLOAD_CACHE';
+    public const ENABLE_AUTOLOAD_DEBUG_DEFINITION = 'ENABLE_AUTOLOAD_DEBUG';
+        
 
     private static $instances = [];
 
@@ -40,28 +32,20 @@ final class Package implements PackageInterface {
      * 
      * Create a package instance.
      * 
-     * @param string $vendor The vendor name (__vendor__/project).
-     * @param string $project The project name (vendor/__project__).
      * @param array $developmentPaths The paths to the PHP source.
      * @param array $additionalPaths An optional list of additional relative directories to use as the root for auto-load functionality (prioritized above __$sourcePath__ if __$enableDebug__ is __FALSE__).     
-     * @param string $projectRoot An optional parameter to override the project root, if needed.
-     * @param SemVerInterface $version The current package version - will be loaded from file, if __NULL__ and if a version definition file exists, or a Composer version tag is available (in _composer.json_).
      * @param bool $enableDebug Enable or disable debug mode. If __TRUE__ __$sourcePath__ will used as the auto-load root; if __FALSE__ __$includePaths__ will be searched before __$sourcePath__.
-     * @param bool $enableCache Enable or disable the autoload cache - if NULL, checks if '_ION_AUTOLOAD_CACHE_' is __TRUE__ - if not, then it defaults to __FALSE__.
+     * @param bool $enableCache Enable or disable the autoload cache - if NULL, checks if 'ENABLE_AUTOLOAD_CACHE' is __TRUE__ - if not, then it defaults to __FALSE__.
      * @param array $loaderClassNames A list of class names to instantiate as loaders - if __NULL__ the default is ['\ion\Packages\Adapters\Psr0Loader', '\ion\Packages\Adapters\Psr4Loader'].     
      * 
-     * @return IPackage Returns the new package instance.
+     * @return PackageInterface Returns the new package instance.
      * 
      */    
     
     public static function create(
             
-            string $vendor,
-            string $project,
             array $developmentPaths,
             array $additionalPaths = null,
-            string $projectRoot = null,
-            SemVerInterface $version = null,
             bool $enableDebug = null,
             bool $enableCache = null,
             array $loaderClassNames = null
@@ -70,12 +54,8 @@ final class Package implements PackageInterface {
         
         return new static(
                 
-            $vendor, 
-            $project, 
             $developmentPaths, 
             $additionalPaths, 
-            $projectRoot, 
-            $version, 
             $enableDebug, 
             $enableCache, 
             $loaderClassNames
@@ -86,7 +66,7 @@ final class Package implements PackageInterface {
      * 
      * Create a search path string for the package.
      * 
-     * @param IPackage $package The package.
+     * @param PackageInterface $package The package.
      * @param string $path The include path.
      * 
      * @return ?string __NULL__ if no string could be created, the string if it could.
@@ -95,7 +75,7 @@ final class Package implements PackageInterface {
     
     public static function createSearchPath(PackageInterface $package, string $path): ?string {
         
-        $includePath = trim($package->getProjectRoot(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . trim($path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        $includePath = trim($package->getProjectRootDirectory(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . trim($path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
 
         //echo $includePath . "\n";
 
@@ -108,120 +88,7 @@ final class Package implements PackageInterface {
 
         return ($includePath === false ? null : $includePath . DIRECTORY_SEPARATOR);        
     }
-    
-    /**
-     * 
-     * Return all registered package instances.
-     * 
-     * @return array An array containing all registered package instances.
-     * 
-     */    
 
-    public static function getInstances(): array {
-        
-        return static::$instances;
-    }
-    
-    /**
-     * 
-     * Check if a package has been registered.
-     * 
-     * @param string $vendorName The package vendor name.
-     * @param string $projectName The package project name.
-     * 
-     * @return bool Returns __true__ if the package as been registered, __false__ if not.
-     * 
-     */
-
-    public static function hasInstance(string $vendorName, string $projectName): bool {
-
-        return (bool) array_key_exists($vendorName . '/' . $projectName, static::$instances);
-    }
-    
-    /**
-     * 
-     * Get a package instance by package name.
-     * 
-     * @param string $vendorName The package vendor name.
-     * @param string $projectName The package project name.
-     * 
-     * @return IPackage Returns the registered package instance.
-     * 
-     */    
-    
-    public static function getInstance(string $vendorName, string $projectName): ?PackageInterface {
-        
-        if(!static::hasInstance($vendorName, $projectName)) {
-
-            return null;
-        }
-    
-        return static::$instances[$vendorName . '/' . $projectName];
-    }
-
-    protected static function destroyInstance(self $instance): void {
-        
-        unset(static::$instances[$instance->getName()]);
-    }
-    
-    protected static function registerInstance(self $instance): void {
-
-        if ($instance->getVersion() !== null) {
-            
-            if (array_key_exists($instance->getName(), static::$instances) === true) {
-
-                $tmp = static::$instances[$instance->getName()];
-                
-                if ($tmp->getVersion() !== null) {
-                    
-                    if ($instance->getVersion()->isLowerThan($tmp->getVersion())) {
-                        
-                        static::$instances[$instance->getName()]->destroy();
-                    }
-                }
-            }
-        }
-
-        static::$instances[$instance->getName()] = $instance;
-        
-        return;
-    }
-
-    /**
-     * 
-     * Get the directory of the last function/method call (or further, depending on $back).
-     * 
-     * @param int $back The number of times / steps to trace back.
-     * 
-     * @return string Return the resulting directory.
-     * 
-     */    
-    
-    public static function getCallingDirectory(int $back = 1): string {
-
-        $trace = debug_backtrace();
-
-        if ($back > count($trace)) {
-            
-            $back = count($trace) - 1;
-        }
-
-        for ($i = 0; $i < $back; $i++) {
-            
-            array_shift($trace);
-        }
-
-        $trace = array_values($trace);
-
-        return dirname($trace[array_search(__FUNCTION__, array_column($trace, 'function'))]['file']) . DIRECTORY_SEPARATOR;
-    }
-
-    private $vendor = null;
-    private $project = null;
-    private $version = null;
-    private $name = null;
-    private $projectRoot = null;
-    private $projectEntry = null;
     private $includePaths = []; 
     private $sourcePaths = null;
     private $searchPaths = [];    
@@ -233,41 +100,17 @@ final class Package implements PackageInterface {
     private $config = null;
     private $hooksRegistered = false;
 
-    protected function __construct(string $vendor, string $project, array $sourcePaths, array $additionalPaths = null, string $projectRoot = null, SemVerInterface $version = null, bool $enableDebug = null, bool $enableCache = null, array $loaderClassNames = null) {
+    protected function __construct(
+        
+            array $sourcePaths, 
+            array $additionalPaths = null, 
+            bool $enableDebug = null, 
+            bool $enableCache = null, 
+            array $loaderClassNames = null
+    ) {
 
-        $this->vendor = $vendor;
-        $this->project = $project;
-        $this->name = $vendor . '/' . $project;
         $this->sourcePaths = $sourcePaths;
-        
-        $tmp = null;
-        
-        if ($projectRoot === null) {
-            
-            $tmp = static::getCallingDirectory();
-            
-        } else {
-            
-            $tmp = $projectRoot;
-        }
-
-        $tmp = realpath($tmp);
-        
-        if(empty($tmp)) {
-            
-            throw new PackageException("Project root / entry '{$projectRoot}' for package '{$vendor}/{$project}' is invalid.");
-        }
-        
-        if(!is_dir($tmp)) {
-            
-            $this->projectEntry = $tmp;                                    
-            $this->projectRoot = pathinfo($tmp . DIRECTORY_SEPARATOR, PATHINFO_DIRNAME) . DIRECTORY_SEPARATOR;
-            
-        } else {
-            
-            $this->projectRoot = $tmp . DIRECTORY_SEPARATOR;
-        }
-        
+                
         $this->config = $this->loadConfiguration();
         
         // Enable source/debug mode?
@@ -278,9 +121,9 @@ final class Package implements PackageInterface {
                         
             if($this->isDependency() === false) {
                 
-                if(defined(static::ION_PACKAGE_DEBUG)) {
+                if(defined(static::ENABLE_AUTOLOAD_DEBUG_DEFINITION)) {
             
-                    $this->enableDebug = (bool) constant(static::ION_PACKAGE_DEBUG) === true;  
+                    $this->enableDebug = (bool) constant(static::ENABLE_AUTOLOAD_DEBUG_DEFINITION) === true;  
                 }
             }
             
@@ -310,9 +153,9 @@ final class Package implements PackageInterface {
         
         if($enableCache === null) {
             
-            if(defined(static::ION_AUTOLOAD_CACHE)) {
+            if(defined(static::ENABLE_AUTOLOAD_CACHE_DEFINITON)) {
             
-                $this->enableCache = (bool) constant(static::ION_AUTOLOAD_CACHE) === true;                
+                $this->enableCache = (bool) constant(static::ENABLE_AUTOLOAD_CACHE_DEFINITON) === true;                
             }
             
             if($this->enableCache === null && $this->hasCacheIndicator()) {
@@ -335,14 +178,7 @@ final class Package implements PackageInterface {
             $this->enableCache = $enableCache;
         }
 
-        
-        $this->version = $version;
-        
-        if($this->version === null) {
-            
-            $this->version = $this->loadVersion();
-        }          
-        
+       
         $this->includePaths = $additionalPaths;
 
         if($this->includePaths === null) {
@@ -377,11 +213,13 @@ final class Package implements PackageInterface {
 
                     $this->loaders[] = $psr0::create($this, $includePath);
                     $this->loaders[] = $psr4::create($this, $includePath);
+
                 } else {      
 
                     foreach($loaderClassNames as $loaderClassName) {
 
                         if(!class_exists($loaderClassName)) {
+
                             throw new PackageException("'$loaderClassName' does not exist and cannot be used as an auto-loader.");
                         }
 
@@ -401,7 +239,7 @@ final class Package implements PackageInterface {
         
         //.gitignore? .git? composer.json? /vendor ? version.json? .hg? .hgignore?
         
-        if(strstr($this->projectRoot, DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR)) {
+        if(strstr($this->getPackage()->getProjectRootDirectory(), DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR)) {
             
             return true;
         }
@@ -415,7 +253,7 @@ final class Package implements PackageInterface {
         
         foreach($repos as $repo) {
             
-            if(is_dir($this->projectRoot . DIRECTORY_SEPARATOR . $repo)) {
+            if(is_dir($this->getPackage()->getProjectRootDirectory() . $repo)) {
                 
                 return true;
             }
@@ -435,6 +273,7 @@ final class Package implements PackageInterface {
     }    
     
     protected function registerLoaders(): void {
+
         if (count($this->getHooks()) === 0) {
 
             try {
@@ -442,16 +281,20 @@ final class Package implements PackageInterface {
                 $self = $this;
                 
                 foreach ($this->loaders as $index => $loader) {
+
                     $this->hooks[] = function(string $className) use ($index, $loader, $self) {
+
                         $loader->load($className);
                     };
                 }
                 
                 foreach ($this->hooks as $hook) {
+
                     spl_autoload_register($hook, true, false);
                 }
                 
             } catch (Exception $ex) {
+
                 throw $ex;
             }
         }
@@ -468,9 +311,11 @@ final class Package implements PackageInterface {
      */    
 
     public function destroy(): void {
+
         if (count($this->getHooks()) > 0) {
 
             foreach ($this->hooks as $hook) {
+
                 spl_autoload_unregister($hook);
             }
 
@@ -508,173 +353,7 @@ final class Package implements PackageInterface {
         return $this->loaders;
     }
     
-    /**
-     * 
-     * Get the the package configuration.
-     * 
-     * @return ConfigurationInterface Returns all registered loaders.
-     * 
-     */        
-    
-    public function getConfiguration(): ConfigurationInterface {
-        
-        if($this->config === null) {
-            
-            $this->config = $this->loadConfiguration();
-        }
-        
-        return $this->config;
-    }
 
-    protected function getVendorRoot(string $includePath, int $phpMajorVersion = null, int $phpMinorVersion = null): string {
-
-        if ($phpMajorVersion !== null || ($phpMajorVersion !== null && $phpMinorVersion !== null)) {
-
-            if ($phpMinorVersion !== null) {
-                return $includePath . DIRECTORY_SEPARATOR . $phpMajorVersion . static::PHP_VERSION_SEPARATOR . $phpMinorVersion . DIRECTORY_SEPARATOR . $this->vendor . DIRECTORY_SEPARATOR;
-            }
-
-            return $includePath . DIRECTORY_SEPARATOR . $phpMajorVersion . DIRECTORY_SEPARATOR . $this->vendor . DIRECTORY_SEPARATOR;
-        }
-
-        return $includePath . DIRECTORY_SEPARATOR . $this->vendor . DIRECTORY_SEPARATOR;
-    }
-      
-    protected function loadConfiguration(): ConfigurationInterface {
-
-        if(defined(static::ION_PACKAGE_IGNORE_CONFIGURATION) && (constant(static::ION_PACKAGE_IGNORE_CONFIGURATION) === true)) {
-            
-            return new Configuration([]);
-        }
-        
-        $data = null;        
-        
-        $path = $this->getProjectRoot() . DIRECTORY_SEPARATOR . static::ION_PACKAGE_CONFIGURATION_FILENAME;
-        
-        if(file_exists($path)) {
-
-            $data = file_get_contents($path);            
-        }        
-        
-        if(empty($data)) {
-            
-            return new Configuration([]);
-        }
-        
-        return Configuration::parseJson($data);
-    }
-
-    protected function loadVersion(): ?SemVerInterface {
-        
-        if(defined(static::ION_PACKAGE_IGNORE_VERSION) && (constant(static::ION_PACKAGE_IGNORE_VERSION) === true)) {
-            
-            return null;
-        }
-
-        $path = $this->getProjectRoot() . static::ION_PACKAGE_VERSION_FILENAME;
-        
-        if(file_exists($path)) {
-        
-            $data = file_get_contents($path);
-            
-            if($data !== false) {
-            
-                $version = SemVer::parsePackageJson($data);
-
-                if($version !== null) {
-                    return $version;
-                }
-            }
-        }
-        
-        $path = $this->getProjectRoot() . static::COMPOSER_FILENAME;
-
-        if(file_exists($path)) {   
-
-            $data = file_get_contents($path);
-
-            if($data !== false) {
-                
-                return SemVer::parseComposerJson($data);
-            }
-        }        
-        
-        return null;
-    }
-
-    /**
-     * 
-     * Get the package version.
-     * 
-     * @return ?SemVerInterface Returns the specified version of the package, or null if not specified.
-     * 
-     */    
-
-    public function getVersion(): ?SemVerInterface {
-        
-        return $this->version;
-    }
-
-    /**
-     * 
-     * Get the package vendor name.
-     * 
-     * @return string Returns the vendor name.
-     * 
-     */    
-    
-    public function getVendor(): string {
-        
-        return $this->vendor;
-    }
-
-    /**
-     * 
-     * Get the package project name.
-     *
-     * @return string Returns the project name.
-     * 
-     */   
-    
-    public function getProject(): string {
-        
-        return $this->project;
-    }
-    
-    /**
-     * Get the package name (in the format vendor/project).
-     *
-     * @return string Returns the package name (in the format vendor/project).
-     * 
-     */  
-
-    public function getName(): string {
-        
-        return $this->name;
-    }
-
-    /**
-     * Get the project root directory.
-     *
-     * @return string Returns the project root directory.
-     * 
-     */    
-    
-    public function getProjectRoot(): string {
-        
-        return $this->projectRoot;
-    }
-    
-    /**
-     * 
-     * Get the project entry file (if available)
-     * 
-     */
-    
-    public function getProjectEntry(): ?string {
-        
-        return $this->projectEntry;
-    }
     
     /**
      * 
