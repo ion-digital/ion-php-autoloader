@@ -1,8 +1,8 @@
 #!/usr/bin/env sh
 
-TARGET=$1
-if [ $TARGET = "" ]; then
-   TARGET="build"
+SCRIPT=$1
+if [ $SCRIPT = "" ]; then
+   SCRIPT="package"
 fi
 
- ./vendor/bin/phing -f ./build.xml $TARGET
+ composer run-script make $SCRIPT

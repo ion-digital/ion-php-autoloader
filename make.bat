@@ -1,6 +1,6 @@
 @echo off
 
-set TARGET=%1
-if "%TARGET%"=="" (set TARGET=build)
+set SCRIPT=%1
+if "%SCRIPT%"=="" (set SCRIPT=package)
 
-.\vendor\bin\phing -f ./build.xml %TARGET%
+composer run-script make %SCRIPT%
