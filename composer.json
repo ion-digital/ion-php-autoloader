@@ -23,7 +23,7 @@
         "ion/packaging": "dev-main"
     },
     "require-dev": {
-        "ion/dev": "dev-main"
+        "ion/packaging-dev": "dev-main"
     },
     
     "minimum-stability": "dev", 
@@ -49,16 +49,8 @@
     },    
     "repositories": [
         {
-            "type": "vcs",
-            "url": "https://github.com/ion-digital/ion-php-dev.git"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/ion-digital/ion-php-packaging.git"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/ion-digital/ion-php-packaging-dev.git"
+            "type": "composer",
+            "url": "https://composer.packages.ion.digital"
         }
     ],
     "config": {
