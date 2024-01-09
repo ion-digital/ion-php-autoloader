@@ -26,7 +26,9 @@
         "ion/packaging-dev": "dev-main"
     },
     
+    "prefer-stable": true,
     "minimum-stability": "dev", 
+    
     "autoload": {
         "files": [
             "index.php"
@@ -49,13 +51,18 @@
     },    
     "repositories": [
         {
+            "type": "vcs",
+            "url": "https://github.com/ion-digital/ion-php-packaging/"
+        },        
+        {
             "type": "composer",
             "url": "https://composer.packages.ion.digital"
         }
     ],
     "config": {
         "allow-plugins": {
-            "ion/dev": true
+            "ion/dev": true,
+            "ion/packaging-dev": true
         }
     }    
 }

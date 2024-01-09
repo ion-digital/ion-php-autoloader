@@ -4,7 +4,7 @@
  * See license information at the package root in LICENSE.md
  */
 
-namespace ion\Packages;
+namespace ion\AutoLoading;
 
 /**
  * Description of Loader
@@ -15,7 +15,7 @@ namespace ion\Packages;
 use \ion\PackageInterface;
 use \ion\Package;
 
-abstract class AutoLoader implements AutoLoaderInterface {        
+abstract class LoaderAdapter implements LoaderAdapterInterface {        
     
     protected const CACHE_FILENAME_PREFIX = 'ion-auto-load';    
     protected const CACHE_FILENAME_EXTENSION = 'php';    
@@ -23,10 +23,11 @@ abstract class AutoLoader implements AutoLoaderInterface {
     protected const CACHE_HEADER = "<?php \n\n// " . self::CACHE_HEADER_COMMENT . "\n\n" . 'if(!defined(\'{$pkg_constant}\')) { header(\'HTTP/1.0 403 Forbidden\'); exit; }' . "\n\n";
     protected const CACHE_FUNCTION_NAME_PREFIX = '__ion_auto_load';
     protected const CACHE_CONSTANT_PREFIX = '__ION_CACHE_';  
-    
-    public static function create(PackageInterface $package, string $includePath): AutoLoaderInterface {
+    protected const CACHE_ENTRY_PATH_KEY = "path";
+
+    public static function create(AutoLoaderInterface $autoLoader, string $includePath): LoaderAdapterInterface {
         
-        return new static($package, $includePath);
+        return new static($autoLoader, $includePath);
     }	
     
     public static function createCacheFilename(string $deploymentId): string {
@@ -49,30 +50,31 @@ abstract class AutoLoader implements AutoLoaderInterface {
         return $string;
     }    
 
-    private $package = null;
+    private $autoLoader = null;
     private $includePath = null;
     private $cache = [];
     private $newEntries = false;
     private $deploymentId = '';
     
-    protected function __construct(PackageInterface $package, string $includePath) {
+    protected function __construct(AutoLoaderInterface $autoLoader, string $includePath) {
         
-        $this->package = $package;
+        $this->autoLoader = $autoLoader;
         $this->includePath = $includePath;
         $this->cache = [];
         $this->newEntries = false;        
-        $this->deploymentId = static::createDeploymentId($package, $includePath);
+        $this->deploymentId = static::createDeploymentId($autoLoader->getPackage(), $includePath);
 		
         //echo "AUTOLOADER: " . $this->deploymentId . "\n";
         
-        if($package->isCacheEnabled()) {
-            $this->loadCache();
-        }
+        if($autoLoader->isCacheEnabled())
+            $this->loadCache();        
         
-        if($package->isCacheEnabled() || ($package->isCacheEnabled() && defined(Package::ION_AUTOLOAD_CACHE_DEBUG) && constant(Package::ION_AUTOLOAD_CACHE_DEBUG) === true)) {                       
+        if($autoLoader->isCacheEnabled() || ($autoLoader->isCacheEnabled() && defined(AutoLoader::ENABLE_AUTOLOAD_DEBUG_DEFINITION) && constant(AutoLoader::ENABLE_AUTOLOAD_DEBUG_DEFINITION) === true)) {                       
+            
             $self = $this;
             
             register_shutdown_function(function() use ($self) {
+
                 $self->saveCache();
             });
         }
@@ -88,9 +90,9 @@ abstract class AutoLoader implements AutoLoaderInterface {
             return $this->deploymentId;
     }
     
-    public function getPackage(): PackageInterface {
+    public function getAutoLoader(): AutoLoaderInterface {
         
-        return $this->package;
+        return $this->autoLoader;
     }
     
     public function getIncludePath(): string {
@@ -109,11 +111,11 @@ abstract class AutoLoader implements AutoLoaderInterface {
 	
         //echo("[CLASSNAME: " . $className . "] [PROJECT: " . $this->getPackage()->getProject() . "] [CACHE ENABLED:" . $this->getPackage()->isCacheEnabled() . "]\n");
         
-        if($this->getPackage()->isCacheEnabled()) {
+        if($this->getAutoLoader()->isCacheEnabled()) {
             
             if($this->hasCacheEntry($className)) {
                 
-                $path = $this->getCacheEntry($className)['path'];
+                $path = $this->getCacheEntry($className)[self::CACHE_ENTRY_PATH_KEY];
                 
                 if(file_exists($path)) {
                 
@@ -125,8 +127,8 @@ abstract class AutoLoader implements AutoLoaderInterface {
             $path = $this->loadClass($className);
             
             if($path !== null) {
-                $this->setCacheEntry($className, $path);
-                
+
+                $this->setCacheEntry($className, $path);                
                 return true;
             }
             
@@ -138,15 +140,11 @@ abstract class AutoLoader implements AutoLoaderInterface {
 
     protected function hasCacheEntry(string $className): bool {
         
-        if(!$this->getPackage()->isCacheEnabled()) {
-            
+        if(!$this->getAutoLoader()->isCacheEnabled())             
             return false;
-        }
         
-        if(array_key_exists($className, $this->cache)) {
-            
+        if(array_key_exists($className, $this->cache))
             return true;
-        }
         
         return false;
     }
@@ -168,19 +166,19 @@ abstract class AutoLoader implements AutoLoaderInterface {
             $this->newEntries = true;
         }
         
-        $this->cache[$className] = [ 'path' => $path ];
+        $this->cache[$className] = [ self::CACHE_ENTRY_PATH_KEY => $path ];
     }
     
     public function saveCache(): void {
                         
-        if($this->newEntries || ($this->getPackage()->isCacheEnabled() && defined(Package::ION_AUTOLOAD_CACHE_DEBUG) && constant(Package::ION_AUTOLOAD_CACHE_DEBUG))) {
+        if($this->newEntries || ($this->getAutoLoader()->isCacheEnabled() && defined(AutoLoader::ENABLE_AUTOLOAD_CACHE_DEFINITON) && constant(AutoLoader::ENABLE_AUTOLOAD_CACHE_DEFINITON))) {
             
             $funcName = static::CACHE_FUNCTION_NAME_PREFIX . '_' . $this->getDeploymentId();
 
             $data = self::strReplace([
                 
                 'php_version' => 'for PHP version ' . PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION . ' ',
-                'pkg_version' => ($this->getPackage()->getVersion() !== null ? 'and package version ' . $this->getPackage()->getVersion()->toString(). ', ' : ''),
+                'pkg_version' => ($this->getAutoLoader()->getPackage()->getVersion() !== null ? 'and package version ' . $this->getAutoLoader()->getPackage()->getVersion()->toString(). ', ' : ''),
                 'time' => strftime('%c'),
                 'pkg_constant' => $this->getConstantName()
                     
@@ -209,10 +207,9 @@ abstract class AutoLoader implements AutoLoaderInterface {
             
             $funcName = static::CACHE_FUNCTION_NAME_PREFIX . '_' . $this->getDeploymentId();
             
-            if(!function_exists($funcName)) {
+            if(!function_exists($funcName))
                 return false;
-            }
-
+            
             $this->cache = $funcName();
 
             return true;

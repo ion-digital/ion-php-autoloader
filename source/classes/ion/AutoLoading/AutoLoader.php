@@ -4,7 +4,7 @@
  * See license information at the package root in LICENSE.md
  */
 
-namespace ion;
+namespace ion\AutoLoading;
 
 /**
  * Description of Package
@@ -12,48 +12,48 @@ namespace ion;
  * @author Justus
  */
 
-use \ion\SemVerInterface;
-use \ion\SemVer;
-use \ion\Packages\PackageException;
-use \ion\Packages\Adapters\Psr0Loader;
-use \ion\Packages\Adapters\Psr4Loader;
-use \ion\ConfigurationInterface;
-use \ion\Configuration;
+use \Ion\PackageInterface;
+use \Ion\Disposable;
+use \Ion\SemVerInterface;
+use \Ion\SemVer;
+use \Ion\AutoLoading\AutoLoaderException;
+use \Ion\AutoLoading\Adapters\Psr0LoaderAdapter;
+use \Ion\AutoLoading\Adapters\Psr4LoaderAdapter;
 
-final class Package implements PackageInterface {
+final class AutoLoader extends Disposable implements AutoLoaderInterface {
 
     public const ENABLE_AUTOLOAD_CACHE_DEFINITON = 'ENABLE_AUTOLOAD_CACHE';
     public const ENABLE_AUTOLOAD_DEBUG_DEFINITION = 'ENABLE_AUTOLOAD_DEBUG';
-        
-
-    private static $instances = [];
 
     /**
      * 
      * Create a package instance.
      * 
+     * @param PackageInterface $package 
      * @param array $developmentPaths The paths to the PHP source.
      * @param array $additionalPaths An optional list of additional relative directories to use as the root for auto-load functionality (prioritized above __$sourcePath__ if __$enableDebug__ is __FALSE__).     
      * @param bool $enableDebug Enable or disable debug mode. If __TRUE__ __$sourcePath__ will used as the auto-load root; if __FALSE__ __$includePaths__ will be searched before __$sourcePath__.
      * @param bool $enableCache Enable or disable the autoload cache - if NULL, checks if 'ENABLE_AUTOLOAD_CACHE' is __TRUE__ - if not, then it defaults to __FALSE__.
      * @param array $loaderClassNames A list of class names to instantiate as loaders - if __NULL__ the default is ['\ion\Packages\Adapters\Psr0Loader', '\ion\Packages\Adapters\Psr4Loader'].     
      * 
-     * @return PackageInterface Returns the new package instance.
+     * @return AutoLoaderInterface Returns the new package instance.
      * 
      */    
     
     public static function create(
             
-            array $developmentPaths,
-            array $additionalPaths = null,
-            bool $enableDebug = null,
-            bool $enableCache = null,
-            array $loaderClassNames = null
-            
-        ): PackageInterface {
+        PackageInterface $package,
+        array $developmentPaths,
+        array $additionalPaths = null,
+        bool $enableDebug = null,
+        bool $enableCache = null,
+        array $loaderClassNames = null
+        
+    ): AutoLoaderInterface {
         
         return new static(
                 
+            $package,
             $developmentPaths, 
             $additionalPaths, 
             $enableDebug, 
@@ -77,18 +77,15 @@ final class Package implements PackageInterface {
         
         $includePath = trim($package->getProjectRootDirectory(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . trim($path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
 
-        //echo $includePath . "\n";
-
-        if(DIRECTORY_SEPARATOR === '/') {
-            
-            $includePath = DIRECTORY_SEPARATOR . $includePath;
-        }
+        if(DIRECTORY_SEPARATOR === '/')    
+            $includePath = DIRECTORY_SEPARATOR . $includePath;        
 
         $includePath = realpath($includePath);
 
         return ($includePath === false ? null : $includePath . DIRECTORY_SEPARATOR);        
     }
 
+    private $package = null;
     private $includePaths = []; 
     private $sourcePaths = null;
     private $searchPaths = [];    
@@ -97,22 +94,22 @@ final class Package implements PackageInterface {
     private $enableCache = false;
     private $enableDebug = false;
     private $cache = [];
-    private $config = null;
     private $hooksRegistered = false;
 
     protected function __construct(
         
-            array $sourcePaths, 
-            array $additionalPaths = null, 
-            bool $enableDebug = null, 
-            bool $enableCache = null, 
-            array $loaderClassNames = null
+        PackageInterface $package,
+        array $sourcePaths, 
+        array $additionalPaths = null, 
+        bool $enableDebug = null, 
+        bool $enableCache = null, 
+        array $loaderClassNames = null
+
     ) {
 
+        $this->package = $package;
         $this->sourcePaths = $sourcePaths;
-                
-        $this->config = $this->loadConfiguration();
-        
+                        
         // Enable source/debug mode?
         
         $this->enableDebug = null;
@@ -200,7 +197,7 @@ final class Package implements PackageInterface {
                 
         foreach ($tmpPaths as $path) {
             
-            $includePath = static::createSearchPath($this, $path);
+            $includePath = static::createSearchPath($this->package, $path);
             
             if($includePath !== null) {            
                 
@@ -208,8 +205,8 @@ final class Package implements PackageInterface {
 
                 if($loaderClassNames === null || (is_array($loaderClassNames) && count($loaderClassNames) === 0)) {
 
-                    $psr0 = Psr0Loader::class;
-                    $psr4 = Psr4Loader::class;
+                    $psr0 = Psr0LoaderAdapter::class;
+                    $psr4 = Psr4LoaderAdapter::class;
 
                     $this->loaders[] = $psr0::create($this, $includePath);
                     $this->loaders[] = $psr4::create($this, $includePath);
@@ -218,31 +215,24 @@ final class Package implements PackageInterface {
 
                     foreach($loaderClassNames as $loaderClassName) {
 
-                        if(!class_exists($loaderClassName)) {
-
-                            throw new PackageException("'$loaderClassName' does not exist and cannot be used as an auto-loader.");
-                        }
+                        if(!class_exists($loaderClassName))
+                            throw new AutoLoaderException("'$loaderClassName' does not exist and cannot be used as an auto-loader.");
 
                         $this->loaders[] = $loaderClassName::create($this, $includePath);
                     }            
                 }                                    
             }
         }
-        
-        static::registerInstance($this);
-        
-        $this->registerLoaders();
 
+        $this->registerLoaders();
     }
     
     protected function isDependency(): ?bool { // NULL = Possibly, not sure; TRUE = Definitely yes; FALSE = Definitely no.
         
         //.gitignore? .git? composer.json? /vendor ? version.json? .hg? .hgignore?
         
-        if(strstr($this->getPackage()->getProjectRootDirectory(), DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR)) {
-            
+        if(strstr($this->getPackage()->getProjectRootDirectory(), DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR))
             return true;
-        }
         
         return null;
     }        
@@ -253,10 +243,8 @@ final class Package implements PackageInterface {
         
         foreach($repos as $repo) {
             
-            if(is_dir($this->getPackage()->getProjectRootDirectory() . $repo)) {
-                
+            if(is_dir($this->getPackage()->getProjectRootDirectory() . $repo))
                 return true;
-            }
         }
         
         return false;
@@ -264,12 +252,16 @@ final class Package implements PackageInterface {
     
     protected function hasDebugIndicator(): bool {
     
-        return $this->getConfiguration()->getSettingAsBool('debug');        
+        return $this->getPackage()->getSettings()->getAsBool("debug");
+
+        //return $this->getConfiguration()->getSettingAsBool('debug');        
     }
     
     protected function hasCacheIndicator(): bool {
     
-        return $this->getConfiguration()->getSettingAsBool('cache');        
+        return $this->getPackage()->getSettings()->getAsBool("cache");
+
+        //return $this->getConfiguration()->getSettingAsBool('cache');        
     }    
     
     protected function registerLoaders(): void {
@@ -301,6 +293,11 @@ final class Package implements PackageInterface {
 
         return;
     }
+
+    public function getPackage(): PackageInterface {
+
+        return $this->package;
+    }
     
     /**
      * 
@@ -310,8 +307,8 @@ final class Package implements PackageInterface {
      * 
      */    
 
-    public function destroy(): void {
-
+     protected function dispose(bool $disposing) {
+        
         if (count($this->getHooks()) > 0) {
 
             foreach ($this->hooks as $hook) {
@@ -321,8 +318,6 @@ final class Package implements PackageInterface {
 
             $this->hooksRegistered = false;
         }
-        
-        static::destroyInstance($this);
         
         return;
     }
