@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ion-digital/ion-php-packaging.git",
-                "reference": "7ec5623455ea4c84f5a7e5090b7b91ead7f8ee45"
+                "reference": "e76b13410d497aca65ecd31ae19eb16bfaacdfa6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ion-digital/ion-php-packaging/zipball/7ec5623455ea4c84f5a7e5090b7b91ead7f8ee45",
-                "reference": "7ec5623455ea4c84f5a7e5090b7b91ead7f8ee45",
+                "url": "https://api.github.com/repos/ion-digital/ion-php-packaging/zipball/e76b13410d497aca65ecd31ae19eb16bfaacdfa6",
+                "reference": "e76b13410d497aca65ecd31ae19eb16bfaacdfa6",
                 "shasum": ""
             },
             "require": {
@@ -67,7 +67,7 @@
                 "source": "https://github.com/ion-digital/ion-php-packaging/tree/main",
                 "issues": "https://github.com/ion-digital/ion-php-packaging/issues"
             },
-            "time": "2024-01-11T15:20:13+00:00"
+            "time": "2024-01-11T15:29:42+00:00"
         }
     ],
     "packages-dev": [
