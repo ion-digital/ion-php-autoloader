@@ -210,8 +210,6 @@ class AutoloaderTest extends TestCase {
 
     public function testSettings() {
 
-        $pkg = static::createPackage(self::TEST_PACKAGE_PROJECT_9, static::createProjectRootFile());
-
         $settings1 = new AutoloaderSettings();
 
         $this->assertTrue($settings1->isCacheEnabled());
@@ -237,6 +235,7 @@ class AutoloaderTest extends TestCase {
         $this->assertFalse($settings5->isCacheEnabled());
         $this->assertTrue($settings5->isDebugEnabled());
 
+        $pkg = static::createPackage(self::TEST_PACKAGE_PROJECT_9, static::createProjectRootFile());
         $this->assertTrue(AutoloaderSettings::exists($pkg));
 
         $settings6 = AutoloaderSettings::load($pkg);
