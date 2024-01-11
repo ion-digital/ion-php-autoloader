@@ -4,7 +4,7 @@
  * See license information at the package root in LICENSE.md
  */
 
-namespace ion\AutoLoading;
+namespace Ion\Autoloading;
 
 /**
  * Description of Loader
@@ -12,8 +12,8 @@ namespace ion\AutoLoading;
  * @author Justus
  */
 
-use \ion\PackageInterface;
-use \ion\Package;
+use \Ion\PackageInterface;
+use \Ion\Package;
 
 abstract class LoaderAdapter implements LoaderAdapterInterface {        
     
@@ -25,7 +25,7 @@ abstract class LoaderAdapter implements LoaderAdapterInterface {
     protected const CACHE_CONSTANT_PREFIX = '__ION_CACHE_';  
     protected const CACHE_ENTRY_PATH_KEY = "path";
 
-    public static function create(AutoLoaderInterface $autoLoader, string $includePath): LoaderAdapterInterface {
+    public static function create(AutoloaderInterface $autoLoader, string $includePath): LoaderAdapterInterface {
         
         return new static($autoLoader, $includePath);
     }	
@@ -56,7 +56,7 @@ abstract class LoaderAdapter implements LoaderAdapterInterface {
     private $newEntries = false;
     private $deploymentId = '';
     
-    protected function __construct(AutoLoaderInterface $autoLoader, string $includePath) {
+    protected function __construct(AutoloaderInterface $autoLoader, string $includePath) {
         
         $this->autoLoader = $autoLoader;
         $this->includePath = $includePath;
@@ -66,10 +66,10 @@ abstract class LoaderAdapter implements LoaderAdapterInterface {
 		
         //echo "AUTOLOADER: " . $this->deploymentId . "\n";
         
-        if($autoLoader->isCacheEnabled())
+        if($autoLoader->getSettings()->isCacheEnabled())
             $this->loadCache();        
         
-        if($autoLoader->isCacheEnabled() || ($autoLoader->isCacheEnabled() && defined(AutoLoader::ENABLE_AUTOLOAD_DEBUG_DEFINITION) && constant(AutoLoader::ENABLE_AUTOLOAD_DEBUG_DEFINITION) === true)) {                       
+        if($autoLoader->getSettings()->isCacheEnabled() || ($autoLoader->getSettings()->isCacheEnabled() && defined(Autoloader::ENABLE_AUTOLOAD_DEBUG_DEFINITION) && constant(Autoloader::ENABLE_AUTOLOAD_DEBUG_DEFINITION) === true)) {                       
             
             $self = $this;
             
@@ -90,7 +90,7 @@ abstract class LoaderAdapter implements LoaderAdapterInterface {
             return $this->deploymentId;
     }
     
-    public function getAutoLoader(): AutoLoaderInterface {
+    public function getAutoloader(): AutoloaderInterface {
         
         return $this->autoLoader;
     }
@@ -104,14 +104,7 @@ abstract class LoaderAdapter implements LoaderAdapterInterface {
     
     public final function load(string $className): bool {
 
-        // This shouldn't be necessary?
-        //if(class_exists($className, false) || interface_exists($className, false) || trait_exists($className, false)) {
-        //	return;
-        //}
-	
-        //echo("[CLASSNAME: " . $className . "] [PROJECT: " . $this->getPackage()->getProject() . "] [CACHE ENABLED:" . $this->getPackage()->isCacheEnabled() . "]\n");
-        
-        if($this->getAutoLoader()->isCacheEnabled()) {
+        if($this->getAutoloader()->getSettings()->isCacheEnabled()) {
             
             if($this->hasCacheEntry($className)) {
                 
@@ -140,7 +133,7 @@ abstract class LoaderAdapter implements LoaderAdapterInterface {
 
     protected function hasCacheEntry(string $className): bool {
         
-        if(!$this->getAutoLoader()->isCacheEnabled())             
+        if(!$this->getAutoloader()->getSettings()->isCacheEnabled())             
             return false;
         
         if(array_key_exists($className, $this->cache))
@@ -151,42 +144,37 @@ abstract class LoaderAdapter implements LoaderAdapterInterface {
     
     protected function getCacheEntry(string $className): ?array {
         
-        if($this->hasCacheEntry($className)) {
-            
+        if($this->hasCacheEntry($className))
             return $this->cache[$className];
-        }
         
         return null;
     }
     
     protected function setCacheEntry(string $className, string $path): void {
 
-        if(!$this->hasCacheEntry($className)) {
-            
+        if(!$this->hasCacheEntry($className))
             $this->newEntries = true;
-        }
         
         $this->cache[$className] = [ self::CACHE_ENTRY_PATH_KEY => $path ];
     }
     
     public function saveCache(): void {
                         
-        if($this->newEntries || ($this->getAutoLoader()->isCacheEnabled() && defined(AutoLoader::ENABLE_AUTOLOAD_CACHE_DEFINITON) && constant(AutoLoader::ENABLE_AUTOLOAD_CACHE_DEFINITON))) {
+        if($this->newEntries || ($this->getAutoloader()->getSettings()->isCacheEnabled() && defined(Autoloader::ENABLE_AUTOLOAD_CACHE_DEFINITON) && constant(Autoloader::ENABLE_AUTOLOAD_CACHE_DEFINITON))) {
             
             $funcName = static::CACHE_FUNCTION_NAME_PREFIX . '_' . $this->getDeploymentId();
 
             $data = self::strReplace([
                 
                 'php_version' => 'for PHP version ' . PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION . ' ',
-                'pkg_version' => ($this->getAutoLoader()->getPackage()->getVersion() !== null ? 'and package version ' . $this->getAutoLoader()->getPackage()->getVersion()->toString(). ', ' : ''),
+                'pkg_version' => ($this->getAutoloader()->getPackage()->getVersion() !== null ? 'and package version ' . $this->getAutoloader()->getPackage()->getVersion()->toString(). ', ' : ''),
                 'time' => strftime('%c'),
                 'pkg_constant' => $this->getConstantName()
                     
             ], static::CACHE_HEADER) . 'function &' . $funcName . '()' . (PHP_MAJOR_VERSION >= 7 ? ': array' : '') . " {\n\$array = " . var_export($this->cache, true) . ";\nreturn \$array;\n}";
             
-            if(is_dir($this->getIncludePath())) {
+            if(is_dir($this->getIncludePath()))
                 file_put_contents($this->getIncludePath() . static::createCacheFilename($this->getDeploymentId()), $data);
-            }
             
             $this->newEntries = false;
         }
@@ -199,9 +187,8 @@ abstract class LoaderAdapter implements LoaderAdapterInterface {
         
         if(file_exists($path)) {      
             
-            if(!defined($this->getConstantName())) {
+            if(!defined($this->getConstantName()))
                 define($this->getConstantName(), true);
-            }
             
             include_once($path);
             

@@ -4,7 +4,7 @@
  * See license information at the package root in LICENSE.md
  */
 
-namespace ion\AutoLoading\Adapters;
+namespace Ion\Autoloading\Adapters;
 
 /**
  * Description of PsrLoader
@@ -12,7 +12,7 @@ namespace ion\AutoLoading\Adapters;
  * @author Justus
  */
 
- use \ion\AutoLoading\LoaderAdapter;
+ use \Ion\Autoloading\LoaderAdapter;
 
 class Psr0LoaderAdapter extends LoaderAdapter {
             

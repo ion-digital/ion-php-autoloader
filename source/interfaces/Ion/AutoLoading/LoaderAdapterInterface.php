@@ -1,13 +1,13 @@
 <?php
 
-namespace ion\AutoLoading;
+namespace Ion\Autoloading;
 
-use \ion\PackageInterface;
-use \ion\AutoLoading\AutoLoaderInterface;
+use \Ion\PackageInterface;
+use \Ion\Autoloading\AutoloaderInterface;
 
 interface LoaderAdapterInterface {
 
-    static function create(AutoLoaderInterface $autoLoader, string $includePath): LoaderAdapterInterface;
+    static function create(AutoloaderInterface $autoLoader, string $includePath): LoaderAdapterInterface;
 
     static function createCacheFilename(string $deploymentId): string;
 
@@ -15,7 +15,7 @@ interface LoaderAdapterInterface {
 
     function getDeploymentId(): string;
 
-    function getAutoLoader(): AutoLoaderInterface;
+    function getAutoloader(): AutoloaderInterface;
 
     function getIncludePath(): string;
 

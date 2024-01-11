@@ -1,10 +1,11 @@
 <?php
 
-namespace ion\AutoLoading;
+namespace Ion\Autoloading;
 
 use \Ion\PackageInterface;
+use \Ion\Autoloading\AutoLoaderSettingsInterface;
 
-interface AutoLoaderInterface {
+interface AutoloaderInterface {
 
     /**
      *
@@ -17,7 +18,7 @@ interface AutoLoaderInterface {
      * @param bool $enableCache Enable or disable the autoload cache - if NULL, checks if 'ENABLE_AUTOLOAD_CACHE' is __TRUE__ - if not, then it defaults to __FALSE__.
      * @param array $loaderClassNames A list of class names to instantiate as loaders - if __NULL__ the default is ['\ion\Packages\Adapters\Psr0Loader', '\ion\Packages\Adapters\Psr4Loader'].
      *
-     * @return AutoLoaderInterface Returns the new package instance.
+     * @return AutoloaderInterface Returns the new package instance.
      *
      */
 
@@ -30,7 +31,7 @@ interface AutoLoaderInterface {
         bool $enableCache = null,
         array $loaderClassNames = null
 
-    ): AutoLoaderInterface;
+    ): AutoloaderInterface;
 
     /**
      *
@@ -46,6 +47,8 @@ interface AutoLoaderInterface {
     static function createSearchPath(PackageInterface $package, string $path): ?string;
 
     function getPackage(): PackageInterface;
+
+    function getSettings(): AutoLoaderSettingsInterface;
 
     /**
      *
@@ -66,26 +69,6 @@ interface AutoLoaderInterface {
      */
 
     function getLoaders(): array;
-
-    /**
-     *
-     * Returns whether the cache is enabled.
-     *
-     * @return bool Returns __true_ if the cache is enabled, __false__ if otherwise.
-     *
-     */
-
-    function isCacheEnabled(): bool;
-
-    /**
-     *
-     * Returns whether debug mode is enabled.
-     *
-     * @return bool Returns __true_ if the debug mode is enabled, __false__ if otherwise.
-     *
-     */
-
-    function isDebugEnabled(): bool;
 
     /**
      *

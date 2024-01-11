@@ -1,8 +1,8 @@
 <?php
 
-namespace ion\AutoLoading;
+namespace Ion\Autoloading;
 
-interface AutoLoaderExceptionInterface {
+interface AutoloaderExceptionInterface {
 
     // No public methods!
 

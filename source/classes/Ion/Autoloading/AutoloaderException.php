@@ -4,10 +4,10 @@
  * See license information at the package root in LICENSE.md
  */
 
-namespace ion\AutoLoading;
+namespace Ion\Autoloading;
 
 /**
- * Description of AutoLoaderException
+ * Description of AutoloaderException
  *
  * @author Justus
  */
@@ -15,7 +15,7 @@ namespace ion\AutoLoading;
 use \Exception;
 use \Throwable;
 
-class AutoLoaderException extends Exception implements AutoLoaderExceptionInterface {
+class AutoloaderException extends Exception implements AutoloaderExceptionInterface {
     
     public function __construct(string $message = "", int $code = 0, Throwable $previous = null) {
         

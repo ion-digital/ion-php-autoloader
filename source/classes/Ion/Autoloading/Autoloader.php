@@ -4,7 +4,7 @@
  * See license information at the package root in LICENSE.md
  */
 
-namespace ion\AutoLoading;
+namespace Ion\Autoloading;
 
 /**
  * Description of Package
@@ -16,14 +16,17 @@ use \Ion\PackageInterface;
 use \Ion\Disposable;
 use \Ion\SemVerInterface;
 use \Ion\SemVer;
-use \Ion\AutoLoading\AutoLoaderException;
-use \Ion\AutoLoading\Adapters\Psr0LoaderAdapter;
-use \Ion\AutoLoading\Adapters\Psr4LoaderAdapter;
+use \Ion\Autoloading\AutoloaderException;
+use \Ion\Autoloading\Adapters\Psr0LoaderAdapter;
+use \Ion\Autoloading\Adapters\Psr4LoaderAdapter;
 
-final class AutoLoader extends Disposable implements AutoLoaderInterface {
+final class Autoloader extends Disposable implements AutoloaderInterface {
 
     public const ENABLE_AUTOLOAD_CACHE_DEFINITON = 'ENABLE_AUTOLOAD_CACHE';
     public const ENABLE_AUTOLOAD_DEBUG_DEFINITION = 'ENABLE_AUTOLOAD_DEBUG';
+
+    private const CACHE_SETTING_KEY = "cache";
+    private const DEBUG_SETTING_KEY = "debug";
 
     /**
      * 
@@ -36,7 +39,7 @@ final class AutoLoader extends Disposable implements AutoLoaderInterface {
      * @param bool $enableCache Enable or disable the autoload cache - if NULL, checks if 'ENABLE_AUTOLOAD_CACHE' is __TRUE__ - if not, then it defaults to __FALSE__.
      * @param array $loaderClassNames A list of class names to instantiate as loaders - if __NULL__ the default is ['\ion\Packages\Adapters\Psr0Loader', '\ion\Packages\Adapters\Psr4Loader'].     
      * 
-     * @return AutoLoaderInterface Returns the new package instance.
+     * @return AutoloaderInterface Returns the new package instance.
      * 
      */    
     
@@ -49,7 +52,7 @@ final class AutoLoader extends Disposable implements AutoLoaderInterface {
         bool $enableCache = null,
         array $loaderClassNames = null
         
-    ): AutoLoaderInterface {
+    ): AutoloaderInterface {
         
         return new static(
                 
@@ -91,10 +94,9 @@ final class AutoLoader extends Disposable implements AutoLoaderInterface {
     private $searchPaths = [];    
     private $hooks = [];
     private $loaders = [];
-    private $enableCache = false;
-    private $enableDebug = false;
     private $cache = [];
     private $hooksRegistered = false;
+    private $settings = null;
 
     protected function __construct(
         
@@ -109,86 +111,68 @@ final class AutoLoader extends Disposable implements AutoLoaderInterface {
 
         $this->package = $package;
         $this->sourcePaths = $sourcePaths;
-                        
+        $this->settings = null;               
+
+        $packageSettings = $this->getPackage()->getSettings();
+        $settings = null;
+
+        if(AutoloaderSettings::exists($package))
+            $settings = AutoloaderSettings::load($package);
+
         // Enable source/debug mode?
-        
-        $this->enableDebug = null;
-        
+
         if($enableDebug === null) {
                         
             if($this->isDependency() === false) {
                 
-                if(defined(static::ENABLE_AUTOLOAD_DEBUG_DEFINITION)) {
-            
-                    $this->enableDebug = (bool) constant(static::ENABLE_AUTOLOAD_DEBUG_DEFINITION) === true;  
-                }
+                if(defined(static::ENABLE_AUTOLOAD_DEBUG_DEFINITION))
+                    $enableDebug = (bool) constant(static::ENABLE_AUTOLOAD_DEBUG_DEFINITION) === true;  
             }
+
+            if($enableDebug == null && $settings !== null)
+                $enableDebug = $settings->isDebugEnabled();
+
+            if($enableDebug == null && $packageSettings->has(self::DEBUG_SETTING_KEY))
+                $enableDebug = $packageSettings->getAsBool(self::DEBUG_SETTING_KEY);
             
-            if($this->enableDebug === null && $this->hasDebugIndicator()) {
-                    
-                $this->enableDebug = true;
-            }
+            if($enableDebug === null && $this->hasRepository() && ($this->isDependency() === false))
+                $enableDebug = true;
             
-            if($this->enableDebug === null && $this->hasRepository() && ($this->isDependency() === false)) {
-                    
-                $this->enableDebug = true;
-            }             
-            
-            if($this->enableDebug === null) {
-                
-                $this->enableDebug = false;
-            }
-            
-        } else {
-            
-            $this->enableDebug = $enableDebug;
-        }                 
+            if($enableDebug === null)
+                $enableDebug = false;
+        }               
 
         // Use the cache?
 
-        $this->enableCache = null;
-        
         if($enableCache === null) {
             
-            if(defined(static::ENABLE_AUTOLOAD_CACHE_DEFINITON)) {
+            if(defined(static::ENABLE_AUTOLOAD_CACHE_DEFINITON))
+                $enableCache = (bool) constant(static::ENABLE_AUTOLOAD_CACHE_DEFINITON) === true;                
             
-                $this->enableCache = (bool) constant(static::ENABLE_AUTOLOAD_CACHE_DEFINITON) === true;                
-            }
+            if($enableCache == null && $settings !== null)
+                $enableCache = $settings->isCacheEnabled();
+
+            if($enableCache == null && $packageSettings->has(self::CACHE_SETTING_KEY))
+                $enableCache = $packageSettings->getAsBool(self::CACHE_SETTING_KEY);
             
-            if($this->enableCache === null && $this->hasCacheIndicator()) {
-                    
-                $this->enableCache = true;
-            }            
-            
-            if($this->enableCache === null && $this->enableDebug === true) {
-                
-                $this->enableCache = false;
-            }
+            if($enableCache === null && $enableDebug === true)
+                $enableCache = false;
                         
-            if($this->enableCache === null) {
-                
-                $this->enableCache = true;
-            }            
-            
-        } else {
-            
-            $this->enableCache = $enableCache;
+            if($enableCache === null)
+                $enableCache = true;
         }
 
+        $this->settings = new AutoLoaderSettings($enableCache, $enableDebug);        
        
         $this->includePaths = $additionalPaths;
 
-        if($this->includePaths === null) {
-            
+        if($this->includePaths === null)
             $this->includePaths = [];
-        }       
         
         $tmpPaths = $this->includePaths;        
         
-        if($this->enableDebug) { 
-            
+        if($this->settings->isDebugEnabled())
             $tmpPaths = []; // Override if 'debug' is true
-        }
         
         // Add the dev directories at the end
         $tmpPaths = array_merge($tmpPaths, $sourcePaths);
@@ -216,7 +200,7 @@ final class AutoLoader extends Disposable implements AutoLoaderInterface {
                     foreach($loaderClassNames as $loaderClassName) {
 
                         if(!class_exists($loaderClassName))
-                            throw new AutoLoaderException("'$loaderClassName' does not exist and cannot be used as an auto-loader.");
+                            throw new AutoloaderException("'$loaderClassName' does not exist and cannot be used as an auto-loader.");
 
                         $this->loaders[] = $loaderClassName::create($this, $includePath);
                     }            
@@ -249,20 +233,6 @@ final class AutoLoader extends Disposable implements AutoLoaderInterface {
         
         return false;
     }
-    
-    protected function hasDebugIndicator(): bool {
-    
-        return $this->getPackage()->getSettings()->getAsBool("debug");
-
-        //return $this->getConfiguration()->getSettingAsBool('debug');        
-    }
-    
-    protected function hasCacheIndicator(): bool {
-    
-        return $this->getPackage()->getSettings()->getAsBool("cache");
-
-        //return $this->getConfiguration()->getSettingAsBool('cache');        
-    }    
     
     protected function registerLoaders(): void {
 
@@ -297,6 +267,11 @@ final class AutoLoader extends Disposable implements AutoLoaderInterface {
     public function getPackage(): PackageInterface {
 
         return $this->package;
+    }
+
+    public function getSettings(): AutoLoaderSettingsInterface {
+
+        return $this->settings;
     }
     
     /**
@@ -347,36 +322,7 @@ final class AutoLoader extends Disposable implements AutoLoaderInterface {
         
         return $this->loaders;
     }
-    
-
-    
-    /**
-     * 
-     * Returns whether the cache is enabled.
-     * 
-     * @return bool Returns __true_ if the cache is enabled, __false__ if otherwise.
-     * 
-     */
-    
-    public function isCacheEnabled(): bool {
-        
-        return $this->enableCache;
-    }
-    
-    
-    /**
-     * 
-     * Returns whether debug mode is enabled.
-     * 
-     * @return bool Returns __true_ if the debug mode is enabled, __false__ if otherwise.
-     * 
-     */    
-    
-    public function isDebugEnabled(): bool {
-        
-        return $this->enableDebug;
-    }    
-    
+       
     /**
      * 
      * Forces all cache items to be saved immediately, and don't wait for shut-down.
