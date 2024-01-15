@@ -4,10 +4,10 @@
  * See license information at the package root in LICENSE.md
  */
 
-$autoloader = __DIR__ . DIRECTORY_SEPARATOR . "vendor/autoload.php";
+$composer = __DIR__ . DIRECTORY_SEPARATOR . "vendor" . DIRECTORY_SEPARATOR . "autoload.php";
 
-if(file_exists($autoloader))
-    require_once $autoloader;
+if(file_exists($composer))
+    require_once $composer;
 
 \Ion\Package::create("ion", "autoloader", function($package) {
 
