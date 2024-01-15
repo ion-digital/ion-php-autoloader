@@ -4,6 +4,11 @@
  * See license information at the package root in LICENSE.md
  */
 
+$bootstrap = realpath(__DIR__ . "/vendor/ion/packaging/bootstrap.php");
+
+if(!empty($bootstrap))
+    require_once($bootstrap);
+
 if(class_exists("\\Ion\\Package")) {
 
     \Ion\Package::create("ion", "autoloader", function($package) {
