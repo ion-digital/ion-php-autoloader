@@ -48,8 +48,7 @@ final class Autoloader extends Disposable implements AutoloaderInterface {
         PackageInterface $package,
         array $developmentPaths,
         array $additionalPaths = null,
-        bool $enableDebug = null,
-        bool $enableCache = null,
+        AutoloaderSettings $settings = null,
         array $loaderClassNames = null
         
     ): AutoloaderInterface {
@@ -59,8 +58,7 @@ final class Autoloader extends Disposable implements AutoloaderInterface {
             $package,
             $developmentPaths, 
             $additionalPaths, 
-            $enableDebug, 
-            $enableCache, 
+            $settings, 
             $loaderClassNames
         );
     }
@@ -95,34 +93,32 @@ final class Autoloader extends Disposable implements AutoloaderInterface {
     private $hooks = [];
     private $loaders = [];
     private $cache = [];
-    private $hooksRegistered = false;
-    private $settings = null;
+    private $hooksRegistered = false;    
 
     protected function __construct(
         
         PackageInterface $package,
         array $sourcePaths, 
         array $additionalPaths = null, 
-        bool $enableDebug = null, 
-        bool $enableCache = null, 
+        AutoloaderSettings $settings = null,
         array $loaderClassNames = null
 
     ) {
 
         $this->package = $package;
-        $this->sourcePaths = $sourcePaths;
-        $this->settings = null;               
+        $this->sourcePaths = $sourcePaths;       
 
         $packageSettings = $this->getPackage()->getSettings();
-        $settings = null;
 
         if(AutoloaderSettings::exists($package))
-            $settings = AutoloaderSettings::load($package);
+            $settings = $settings ?? AutoloaderSettings::load($package);
 
-        // Enable source/debug mode?
+        if($settings === null) {
 
-        if($enableDebug === null) {
-                        
+            // Enable source/debug mode?
+            
+            $enableDebug = false;
+
             if($this->isDependency() === false) {
                 
                 if(defined(static::ENABLE_AUTOLOAD_DEBUG_DEFINITION))
@@ -140,12 +136,11 @@ final class Autoloader extends Disposable implements AutoloaderInterface {
             
             if($enableDebug === null)
                 $enableDebug = false;
-        }               
 
-        // Use the cache?
+            // Use the cache?
 
-        if($enableCache === null) {
-            
+            $enableCache = true;
+
             if(defined(static::ENABLE_AUTOLOAD_CACHE_DEFINITON))
                 $enableCache = (bool) constant(static::ENABLE_AUTOLOAD_CACHE_DEFINITON) === true;                
             
@@ -160,9 +155,14 @@ final class Autoloader extends Disposable implements AutoloaderInterface {
                         
             if($enableCache === null)
                 $enableCache = true;
-        }
 
-        $this->settings = new AutoLoaderSettings($enableCache, $enableDebug);        
+            $settings = new AutoLoaderSettings(
+            
+                $this->getPackage(),
+                $enableCache, 
+                $enableDebug
+            );
+        }  
        
         $this->includePaths = $additionalPaths;
 
@@ -171,7 +171,7 @@ final class Autoloader extends Disposable implements AutoloaderInterface {
         
         $tmpPaths = $this->includePaths;        
         
-        if($this->settings->isDebugEnabled())
+        if($this->getSettings()->isDebugEnabled())
             $tmpPaths = []; // Override if 'debug' is true
         
         // Add the dev directories at the end
@@ -271,7 +271,7 @@ final class Autoloader extends Disposable implements AutoloaderInterface {
 
     public function getSettings(): AutoLoaderSettingsInterface {
 
-        return $this->settings;
+        return AutoLoaderSettings::get($this->getPackage());
     }
     
     /**

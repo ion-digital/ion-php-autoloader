@@ -7,19 +7,32 @@
 namespace Ion\Autoloading;
 
 use \Ion\PackageInterface;
+use \Ion\Disposable;
 
-class AutoloaderSettings implements AutoloaderSettingsInterface {
+class AutoloaderSettings extends Disposable implements AutoloaderSettingsInterface {
 
     private const AUTOLOADER_JSON_FILENAME = "autoloader.json";
+    private const ENABLE_DEBUG_VALUE_KEY = "debug";
+    private const ENABLE_CACHE_VALUE_KEY = "cache";
 
-    private $enableCache = false;
-    private $enableDebug = false;
+    private static $instances = [];
 
     private static function getPath(PackageInterface $package, string $filename = null): string {
 
         $filename = $filename ?? self::AUTOLOADER_JSON_FILENAME;
 
         return "{$package->getProjectRootDirectory()}{$filename}";
+    }
+
+    public static function get(PackageInterface $package, AutoloaderSettingsInterface $defaults = null): AutoloaderSettingsInterface  {
+
+        if(static::hasInstance($package))
+            return static::getInstance($package);
+
+        if($defaults !== null)
+            return $defaults;
+
+        return new static($package);
     }
 
     public static function load(PackageInterface $package, string $filename = null): AutoloaderSettingsInterface  {
@@ -46,6 +59,7 @@ class AutoloaderSettings implements AutoloaderSettingsInterface {
 
         return new AutoloaderSettings(
 
+            $package,
             isset($obj->cache) ? $obj->cache : false, 
             isset($obj->debug) ? $obj->debug : false
         );
@@ -61,10 +75,76 @@ class AutoloaderSettings implements AutoloaderSettingsInterface {
         return true;
     }
 
-    public function __construct(bool $enableCache = true, bool $enableDebug = false) {
+    protected static function getInstance(PackageInterface $package): ?AutoloaderSettingsInterface {
+        
+        if(!static::hasInstance($package))
+            return null;
+    
+        return static::$instances[$package->getName()];
+    }    
 
-        $this->enableCache = $enableCache;
-        $this->enableDebug = $enableDebug;
+    protected static function hasInstance(PackageInterface $package): bool {
+
+        return (bool) array_key_exists($package->getName(), static::$instances);
+    }    
+
+    protected static function destroyInstance(AutoloaderSettingsInterface $settings): void {
+        
+        if(!static::hasInstance($settings->getPackage()))
+            return;     
+
+        unset(static::$instances[$settings->getPackage()->getName()]);
+    }
+    
+    protected static function registerInstance(AutoloaderSettingsInterface $settings): void {
+
+        if (static::hasInstance($settings->getPackage()))
+            throw new AutoloaderSettingsException("Settings have already been registered for package: '{$settings->getPackage()->getName()}.'");
+
+        static::$instances[$settings->getPackage()->getName()] = $settings;        
+        return;
+    }    
+
+    private $package = null;
+    private $values = [];
+
+    public function __construct(
+        
+            PackageInterface $package, 
+            bool $enableCache = true, 
+            bool $enableDebug = false
+
+        ) {
+
+        $this->package = $package;
+
+        $this->setValue(static::ENABLE_CACHE_VALUE_KEY, $enableCache);
+        $this->setValue(static::ENABLE_DEBUG_VALUE_KEY, $enableDebug);
+
+        static::registerInstance($this);
+    }
+
+    protected function dispose(bool $disposing) {
+
+        static::destroyInstance($this);
+    }
+
+    protected function getValue(string $key, $default = null) {
+
+        if(!array_key_exists($key, $this->values))
+            return $default;
+
+        return $this->values[$key];
+    }
+
+    protected function setValue(string $key, $value = null): void {
+
+        $this->values[$key] = $value;
+    }
+
+    public function getPackage(): PackageInterface {
+
+        return $this->package;
     }
 
     /**
@@ -77,7 +157,7 @@ class AutoloaderSettings implements AutoloaderSettingsInterface {
     
      public function isCacheEnabled(): bool {
         
-        return $this->enableCache;
+        return $this->getValue(static::ENABLE_CACHE_VALUE_KEY, false);
     }
     
     
@@ -91,6 +171,6 @@ class AutoloaderSettings implements AutoloaderSettingsInterface {
     
     public function isDebugEnabled(): bool {
         
-        return $this->enableDebug;
+        return $this->getValue(static::ENABLE_DEBUG_VALUE_KEY, false);
     }        
 }

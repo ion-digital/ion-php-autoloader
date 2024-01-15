@@ -3,6 +3,7 @@
 namespace Ion\Autoloading;
 
 use \Ion\PackageInterface;
+use \Ion\Autoloading\AutoloaderSettings;
 use \Ion\Autoloading\AutoLoaderSettingsInterface;
 
 interface AutoloaderInterface {
@@ -27,8 +28,7 @@ interface AutoloaderInterface {
         PackageInterface $package,
         array $developmentPaths,
         array $additionalPaths = null,
-        bool $enableDebug = null,
-        bool $enableCache = null,
+        AutoloaderSettings $settings = null,
         array $loaderClassNames = null
 
     ): AutoloaderInterface;

@@ -86,17 +86,18 @@ class AutoloaderTest extends TestCase {
     
     private static function createAutoloader(string $project, bool $debug = null, bool $cache = null, array $loaders = null, bool $createFileName = true) {
 
+        $pkg = static::createPackage($project, $createFileName);
+
         return Autoloader::create(
             
-            static::createPackage($project, $createFileName), 
+            $pkg, 
             [ self::SOURCE_DIRECTORY ], 
             [            
                 self::EXTRA_DIRECTORY_1,
                 self::EXTRA_DIRECTORY_2,
                 self::NON_EXISTENT_DIRECTORY
             ], 
-            $debug, 
-            $cache, 
+            new AutoloaderSettings($pkg, $cache ?? false, $debug ?? false),
             $loaders
         );
     }
@@ -107,8 +108,8 @@ class AutoloaderTest extends TestCase {
 
         $al = static::createAutoloader(self::TEST_PACKAGE_PROJECT_1, true, false);
         
-        $this->assertEquals(true, $al->getSettings()->isDebugEnabled());
-        $this->assertEquals(false, $al->getSettings()->isCacheEnabled());
+        $this->assertTrue($al->getSettings()->isDebugEnabled());
+        $this->assertFalse($al->getSettings()->isCacheEnabled());
         $this->assertEquals(3, count($al->getAdditionalPaths()));        
         $this->assertEquals(1, count($al->getDevelopmentPaths()));
         $this->assertEquals(1, count($al->getSearchPaths())); // Debug === true        
@@ -126,16 +127,19 @@ class AutoloaderTest extends TestCase {
         
         $al = self::createAutoloader(self::TEST_PACKAGE_PROJECT_5, false, false);        
         
-        $this->assertEquals(false, $al->getSettings()->isDebugEnabled());
-        $this->assertEquals(false, $al->getSettings()->isCacheEnabled());
+// var_dump($al->getSettings());
+// exit;
+
+        $this->assertFalse($al->getSettings()->isDebugEnabled());
+        $this->assertFalse($al->getSettings()->isCacheEnabled());
         
-        $this->assertEquals(false, class_exists('\\Tests\\TestClass1', false));
+        $this->assertFalse(class_exists('\\Tests\\TestClass1', false));
         $testClass1 = new \Tests\TestClass1();
-        $this->assertEquals(true, class_exists('\\Tests\\TestClass1', false));        
+        $this->assertTrue(class_exists('\\Tests\\TestClass1', false));        
         
-        $this->assertEquals(false, class_exists('\\TestClass3', false));
+        $this->assertFalse(class_exists('\\TestClass3', false));
         $testClass3 = new \TestClass3();
-        $this->assertEquals(true, class_exists('\\TestClass3', false));     
+        $this->assertTrue(class_exists('\\TestClass3', false));     
         
         $al->destroy();
     }
@@ -144,28 +148,28 @@ class AutoloaderTest extends TestCase {
         
         $al = self::createAutoloader(self::TEST_PACKAGE_PROJECT_6, false, true);
 
-        $this->assertEquals(false, $al->getSettings()->isDebugEnabled());
-        $this->assertEquals(true, $al->getSettings()->isCacheEnabled());
+        $this->assertFalse($al->getSettings()->isDebugEnabled());
+        $this->assertTrue($al->getSettings()->isCacheEnabled());
         
-        $this->assertEquals(false, class_exists('\\Tests\\TestClass2', false));
+        $this->assertFalse(class_exists('\\Tests\\TestClass2', false));
         $testClass2 = new \Tests\TestClass2();
-        $this->assertEquals(true, class_exists('\\Tests\\TestClass2', false));        
+        $this->assertTrue(class_exists('\\Tests\\TestClass2', false));        
         
-        $this->assertEquals(false, class_exists('\\TestClass4', false));
+        $this->assertFalse(class_exists('\\TestClass4', false));
         $testClass4 = new \TestClass4();
-        $this->assertEquals(true, class_exists('\\TestClass4', false));
+        $this->assertTrue(class_exists('\\TestClass4', false));
                 
         $a = Autoloader::createSearchPath($al->getPackage(), self::SOURCE_DIRECTORY);
         $b = Autoloader::createSearchPath($al->getPackage(), self::EXTRA_DIRECTORY_1);
         $c = Autoloader::createSearchPath($al->getPackage(), self::EXTRA_DIRECTORY_2);
 
-        $this->assertEquals(true, $a !== null);
-        $this->assertEquals(true, $b !== null);
-        $this->assertEquals(true, $c !== null);
+        $this->assertNotNull($a);
+        $this->assertNotNull($b);
+        $this->assertNotNull($c);
         
-        $this->assertEquals(true, in_array($a, $al->getSearchPaths(false)));
-        $this->assertEquals(true, in_array($b, $al->getSearchPaths(false)));
-        $this->assertEquals(true, in_array($c, $al->getSearchPaths(false)));
+        $this->assertTrue(in_array($a, $al->getSearchPaths(false)));
+        $this->assertTrue(in_array($b, $al->getSearchPaths(false)));
+        $this->assertTrue(in_array($c, $al->getSearchPaths(false)));
 
         $aId = LoaderAdapter::createDeploymentId($al->getPackage(), $a);
         $bId = LoaderAdapter::createDeploymentId($al->getPackage(), $b);
@@ -179,9 +183,9 @@ class AutoloaderTest extends TestCase {
         
         $al->flushCache();
         
-        $this->assertEquals(true, file_exists($a));
-        $this->assertEquals(false, file_exists($b));
-        $this->assertEquals(true, file_exists($c));
+        $this->assertTrue(file_exists($a));
+        $this->assertFalse(file_exists($b));
+        $this->assertTrue(file_exists($c));
         
         $al->destroy();
     }
@@ -190,16 +194,16 @@ class AutoloaderTest extends TestCase {
 		        
         $al1 = self::createAutoloader(self::TEST_PACKAGE_PROJECT_7, true, false);     
         
-        $this->assertEquals(true, $al1->getSettings()->isDebugEnabled());
-        $this->assertEquals(false, $al1->getSettings()->isCacheEnabled());        
+        $this->assertTrue($al1->getSettings()->isDebugEnabled());
+        $this->assertFalse($al1->getSettings()->isCacheEnabled());        
         $this->assertEquals(3, count($al1->getAdditionalPaths()));        
         $this->assertEquals(1, count($al1->getDevelopmentPaths()));      
         $this->assertEquals(1, count($al1->getSearchPaths())); // Debug === true        
         
         $al2 = self::createAutoloader(self::TEST_PACKAGE_PROJECT_8, false, false);      
         
-        $this->assertEquals(false, $al2->getSettings()->isDebugEnabled());     
-        $this->assertEquals(false, $al2->getSettings()->isCacheEnabled());
+        $this->assertFalse($al2->getSettings()->isDebugEnabled());     
+        $this->assertFalse($al2->getSettings()->isCacheEnabled());
         $this->assertEquals(3, count($al2->getAdditionalPaths()));        
         $this->assertEquals(3, count($al2->getSearchPaths()));
         $this->assertEquals(1, count($al2->getDevelopmentPaths()));
@@ -210,37 +214,76 @@ class AutoloaderTest extends TestCase {
 
     public function testSettings() {
 
-        $settings1 = new AutoloaderSettings();
+        $pkg1 = static::createPackage(self::TEST_PACKAGE_PROJECT_9, static::createProjectRootFile());
+
+        $settings1 = new AutoloaderSettings($pkg1);
 
         $this->assertTrue($settings1->isCacheEnabled());
         $this->assertFalse($settings1->isDebugEnabled());
 
-        $settings2 = new AutoloaderSettings(false, false);
+        $this->assertTrue(AutoloaderSettings::get($pkg1)->isCacheEnabled());
+        $this->assertFalse(AutoloaderSettings::get($pkg1)->isDebugEnabled());        
+
+        $settings1->destroy();
+
+        $settings2 = new AutoloaderSettings($pkg1, false, false);
 
         $this->assertFalse($settings2->isCacheEnabled());
         $this->assertFalse($settings2->isDebugEnabled());
 
-        $settings3 = new AutoloaderSettings(true, false);
+        $this->assertFalse(AutoloaderSettings::get($pkg1)->isCacheEnabled());
+        $this->assertFalse(AutoloaderSettings::get($pkg1)->isDebugEnabled());  
+
+        $settings2->destroy();
+
+        $settings3 = new AutoloaderSettings($pkg1, true, false);
 
         $this->assertTrue($settings3->isCacheEnabled());
         $this->assertFalse($settings3->isDebugEnabled());
 
-        $settings4 = new AutoloaderSettings(true, true);
+        $this->assertTrue(AutoloaderSettings::get($pkg1)->isCacheEnabled());
+        $this->assertFalse(AutoloaderSettings::get($pkg1)->isDebugEnabled());          
+
+        $settings3->destroy();
+
+        $settings4 = new AutoloaderSettings($pkg1, true, true);
 
         $this->assertTrue($settings4->isCacheEnabled());
         $this->assertTrue($settings4->isDebugEnabled());
 
-        $settings5 = new AutoloaderSettings(false, true);
+        $this->assertTrue(AutoloaderSettings::get($pkg1)->isCacheEnabled());
+        $this->assertTrue(AutoloaderSettings::get($pkg1)->isDebugEnabled());  
+
+        $settings4->destroy();
+
+        $settings5 = new AutoloaderSettings($pkg1, false, true);
 
         $this->assertFalse($settings5->isCacheEnabled());
         $this->assertTrue($settings5->isDebugEnabled());
 
-        $pkg = static::createPackage(self::TEST_PACKAGE_PROJECT_9, static::createProjectRootFile());
-        $this->assertTrue(AutoloaderSettings::exists($pkg));
+        $this->assertFalse(AutoloaderSettings::get($pkg1)->isCacheEnabled());
+        $this->assertTrue(AutoloaderSettings::get($pkg1)->isDebugEnabled());          
 
-        $settings6 = AutoloaderSettings::load($pkg);
+        $settings5->destroy();
+
+        $pkg2 = static::createPackage(self::TEST_PACKAGE_PROJECT_10, static::createProjectRootFile());
+        $this->assertTrue(AutoloaderSettings::exists($pkg2));
+
+        $settings6 = AutoloaderSettings::load($pkg2);
 
         $this->assertFalse($settings6->isCacheEnabled());
         $this->assertTrue($settings6->isDebugEnabled());
+
+        $settings7 = AutoloaderSettings::get($pkg2);
+
+        $this->assertFalse($settings7->isCacheEnabled());
+        $this->assertTrue($settings7->isDebugEnabled());        
+
+        $pkg1->destroy();
+
+        $this->expectException(AutoloaderSettingsException::class);
+        $settings8 = new AutoloaderSettings($pkg2, false, true);
+
+        $pkg2->destroy();
     }
 }
