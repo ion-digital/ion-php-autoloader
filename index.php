@@ -4,41 +4,37 @@
  * See license information at the package root in LICENSE.md
  */
 
-$composer = __DIR__ . DIRECTORY_SEPARATOR . "vendor" . DIRECTORY_SEPARATOR . "autoload.php";
+if(class_exists("\\Ion\\Package")) {
 
-if(file_exists($composer))
-    require_once $composer;
+    \Ion\Package::create("ion", "autoloader", function($package) {
 
-\Ion\Package::create("ion", "autoloader", function($package) {
-
-    spl_autoload_register(function( /* string */ $className) {
-    
-        $dirs = [
-            
-            'source/classes',
-            'source/interfaces',
-            'source/traits',
-            'builds/' . PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION,
-            'builds/' . PHP_MAJOR_VERSION,
-        ];
-    
-        foreach($dirs as $dir) {
+        spl_autoload_register(function( /* string */ $className) {
         
-            $classPath = __DIR__ . DIRECTORY_SEPARATOR . $dir . DIRECTORY_SEPARATOR . str_replace("\\", DIRECTORY_SEPARATOR, $className) . '.php';
-            
-            $classPath = realPath($classPath);
-            
-            if (file_exists($classPath)) {
+            $dirs = [
                 
-                require_once($classPath);
-                break;
-            }
-        }
+                'source/classes',
+                'source/interfaces',
+                'source/traits',
+                'builds/' . PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION,
+                'builds/' . PHP_MAJOR_VERSION,
+            ];
         
-    }, true, true);
-    
-    return null;
+            foreach($dirs as $dir) {
+            
+                $classPath = __DIR__ . DIRECTORY_SEPARATOR . $dir . DIRECTORY_SEPARATOR . str_replace("\\", DIRECTORY_SEPARATOR, $className) . '.php';
+                
+                $classPath = realPath($classPath);
+                
+                if (file_exists($classPath)) {
+                    
+                    require_once($classPath);
+                    break;
+                }
+            }
+            
+        }, true, true);
+        
+        return null;
 
-}, __FILE__);
-
-
+    }, __FILE__);
+}
