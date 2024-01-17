@@ -2,16 +2,9 @@
 
 namespace Ion\Autoloading;
 
-use \Ion\PackageInterface;
 use \Ion\Autoloading\AutoloaderInterface;
 
 interface LoaderAdapterInterface {
-
-    static function create(AutoloaderInterface $autoLoader, string $includePath): LoaderAdapterInterface;
-
-    static function createCacheFilename(string $deploymentId): string;
-
-    static function createDeploymentId(PackageInterface $package, string $includePath): string;
 
     function getDeploymentId(): string;
 

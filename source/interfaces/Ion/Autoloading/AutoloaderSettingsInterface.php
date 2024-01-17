@@ -6,12 +6,6 @@ use \Ion\PackageInterface;
 
 interface AutoloaderSettingsInterface {
 
-    static function get(PackageInterface $package, AutoloaderSettingsInterface $defaults = null): AutoloaderSettingsInterface;
-
-    static function load(PackageInterface $package, string $filename = null): AutoloaderSettingsInterface;
-
-    static function exists(PackageInterface $package, string $filename = null): bool;
-
     function getPackage(): PackageInterface;
 
     /**
