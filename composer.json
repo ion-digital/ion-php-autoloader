@@ -20,7 +20,7 @@
     ],
     "require": {
         "php": ">=7.4",
-        "ion/packaging": "dev-main"
+        "ion/packaging": "^1.0.0"
     },
     "require-dev": {
         "ion/packaging-dev": "dev-main"
@@ -68,6 +68,9 @@
         }
     ],
     "config": {
+
+        "process-timeout": 900,
+
         "allow-plugins": {
             "ion/dev": true,
             "ion/packaging-dev": true
