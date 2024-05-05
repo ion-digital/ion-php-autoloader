@@ -11,6 +11,7 @@ namespace Ion\Autoloading;
  */
 use Ion\PackageInterface;
 use Ion\Package;
+use IntlDateFormatter;
 abstract class LoaderAdapter implements LoaderAdapterInterface
 {
     protected const CACHE_FILENAME_PREFIX = 'ion-auto-load';
@@ -126,7 +127,8 @@ abstract class LoaderAdapter implements LoaderAdapterInterface
     {
         if ($this->newEntries || $this->getAutoloader()->getSettings()->isCacheEnabled() && defined(Autoloader::ENABLE_AUTOLOAD_CACHE_DEFINITON) && constant(Autoloader::ENABLE_AUTOLOAD_CACHE_DEFINITON)) {
             $funcName = static::CACHE_FUNCTION_NAME_PREFIX . '_' . $this->getDeploymentId();
-            $data = self::strReplace(['php_version' => 'for PHP version ' . PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION . ' ', 'pkg_version' => $this->getAutoloader()->getPackage()->getVersion() !== null ? 'and package version ' . $this->getAutoloader()->getPackage()->getVersion()->toString() . ', ' : '', 'time' => strftime('%c'), 'pkg_constant' => $this->getConstantName()], static::CACHE_HEADER) . 'function &' . $funcName . '()' . (PHP_MAJOR_VERSION >= 7 ? ': array' : '') . " {\n\$array = " . var_export($this->cache, true) . ";\nreturn \$array;\n}";
+            $formatter = new IntlDateFormatter(null, IntlDateFormatter::LONG, IntlDateFormatter::NONE);
+            $data = self::strReplace(['php_version' => 'for PHP version ' . PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION . ' ', 'pkg_version' => $this->getAutoloader()->getPackage()->getVersion() !== null ? 'and package version ' . $this->getAutoloader()->getPackage()->getVersion()->toString() . ', ' : '', 'time' => $formatter->format(time()), 'pkg_constant' => $this->getConstantName()], static::CACHE_HEADER) . 'function &' . $funcName . '()' . (PHP_MAJOR_VERSION >= 7 ? ': array' : '') . " {\n\$array = " . var_export($this->cache, true) . ";\nreturn \$array;\n}";
             if (is_dir($this->getIncludePath())) {
                 file_put_contents($this->getIncludePath() . static::createCacheFilename($this->getDeploymentId()), $data);
             }
