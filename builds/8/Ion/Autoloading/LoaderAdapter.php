@@ -14,6 +14,7 @@ namespace Ion\Autoloading;
 
 use \Ion\PackageInterface;
 use \Ion\Package;
+use \IntlDateFormatter;
 
 abstract class LoaderAdapter implements LoaderAdapterInterface {        
     
@@ -164,11 +165,13 @@ abstract class LoaderAdapter implements LoaderAdapterInterface {
             
             $funcName = static::CACHE_FUNCTION_NAME_PREFIX . '_' . $this->getDeploymentId();
 
+            $formatter = new IntlDateFormatter(null, IntlDateFormatter::LONG, IntlDateFormatter::NONE);
+
             $data = self::strReplace([
                 
                 'php_version' => 'for PHP version ' . PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION . ' ',
                 'pkg_version' => ($this->getAutoloader()->getPackage()->getVersion() !== null ? 'and package version ' . $this->getAutoloader()->getPackage()->getVersion()->toString(). ', ' : ''),
-                'time' => strftime('%c'),
+                'time' => $formatter->format(time()),
                 'pkg_constant' => $this->getConstantName()
                     
             ], static::CACHE_HEADER) . 'function &' . $funcName . '()' . (PHP_MAJOR_VERSION >= 7 ? ': array' : '') . " {\n\$array = " . var_export($this->cache, true) . ";\nreturn \$array;\n}";
